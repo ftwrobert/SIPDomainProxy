@@ -1,2 +1,2 @@
 # SIPDomainProxy
-An application to proxy Session Initiation Protocol between hosts on the open internet and hosted PBX's that exist behind NAT.
+SIPDomainProxy is an application that proxies Session Initiation Protocol between hosts on the internet and hosted PBX's that exist behind NAT.
