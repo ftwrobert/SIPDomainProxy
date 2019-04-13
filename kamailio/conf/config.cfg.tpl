@@ -18,8 +18,8 @@
 #!subst "/PRIVMASK//"
 
 # Kamailio Ports
-#!subst "/SIPPORT/5060/"
-#!subst "/SIPTLSPORT/5061/"
+#!subst "/SIPPORT//"
+#!subst "/SIPTLSPORT//"
 
 # RTP Engine paramaters
 #!subst "/RTPE_SOCKET//"
