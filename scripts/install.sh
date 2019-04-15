@@ -23,9 +23,11 @@ DBPORT=5432
 KAMAILIO_USER=kamailio
 PUBADDR=$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | awk -F'"' '{ print $2}')
 # Another option $(dig -4 +short myip.opendns.com @resolver1.opendns.com)
-PRIVADDR=$(ip route list match 0 | cut -f 3 -d ' ')
-PRIVSUBNET=$(ip route list match $PRIVADDR | grep $PRIVADDR | cut -f 1 -d ' ' | cut -f 1 -d '/')
-PRIVMASK=$(ip route list match $PRIVADDR | grep $PRIVADDR | cut -f 1 -d ' ' | cut -f 1 -d '/')
+DEFGW=$(ip route list match 0 | cut -f 3 -d ' ')
+ROUTE=$(ip route list match $DEFGW | grep -v $DEFGW)
+PRIVADDR=$(echo "$ROUTE" | grep -oE "src .*" | cut -f 2 -d ' ')
+PRIVSUBNET=$(echo "$ROUTE" | cut -f 1 -d '/')
+PRIVMASK=$(echo "$ROUTE" | cut -f 2 -d '/' | cut -f 1 -d ' ')
 SIPPORT='5060'
 SIPTLSPORT='5061'
 RTPE_MIN_PORT='52000'
@@ -201,7 +203,7 @@ table=$RTPE_FWD_TABLE
 tos=184
 port-min=$RTPE_MIN_PORT
 port-max=$RTPE_MAX_PORT
-no-fallback=true
+no-fallback=false
 iptables-chain=RTPENGINE_ALLOWED
 interface=$PRIVADDR
 delete-delay=0
@@ -222,8 +224,10 @@ chmod +x /usr/local/bin/before-rtpengine
 # RTPengine Startup Script
 cat > /lib/systemd/system/rtpengine.service <<END_OF_UNIT_FILE
 [Unit]
-Description=A proxy for RTP and other UDP based media traffic.
-After=network.target
+Description=NGCP RTP/media Proxy Daemon
+After=network-online.target
+After=remote-fs.target
+Requires=network-online.target
 
 [Service]
 Type=forking
@@ -256,12 +260,12 @@ systemctl status rtpengine
 cat > /lib/systemd/system/kamailio.service <<END_OF_UNIT_FILE
 [Unit]
 Description=Kamailio (OpenSER) - the Open Source SIP Server
-After=network.target rtpproxy.service
+After=network.target rtpengine.service
 
 [Service]
 Type=forking
 Environment='OPTS=-m 512 -M 8 -u $KAMAILIO_USER -g $KAMAILIO_USER'
-Environment='CFGFILE=/etc/kamailio/conf/kamailio.cfg'
+Environment='CFGFILE=/etc/kamailio/kamailio.cfg'
 Environment='PIDFile=/var/run/kamailio.pid'
 # PIDFile requires a full absolute path
 PIDFile=/var/run/kamailio.pid
@@ -285,24 +289,24 @@ cat > config.cfg <<EOF
 ################################################################################
 
 # Database connectivity
-!subst "/DBDRIVER/$DBDRIVER/"
-!subst "/DBHOST/$DBHOST/"
-!subst "/DBUSER/$DBUSER/"
-!subst "/DBPASS/$DBPASS/"
-!subst "/DBNAME/$DBNAME/"
+#!subst "/DBDRIVER/$DBDRIVER/"
+#!subst "/DBHOST/$DBHOST/"
+#!subst "/DBUSER/$DBUSER/"
+#!subst "/DBPASS/$DBPASS/"
+#!subst "/DBNAME/$DBNAME/"
 
 # IP Addresses
-!subst "/PUBADDR/$PUBADDR/"
-!subst "/PRIVADDR/$PRIVADDR/"
-!subst "/PRIVSUBNET/$PRIVSUBNET/"
-!subst "/PRIVMASK/$PRIVMASK/"
+#!subst "/PUBADDR/$PUBADDR/"
+#!subst "/PRIVADDR/$PRIVADDR/"
+#!subst "/PRIVSUBNET/$PRIVSUBNET/"
+#!subst "/PRIVMASK/$PRIVMASK/"
 
 # Kamailio Ports
-!subst "/SIPPORT/$SIPPORT/"
-!subst "/SIPTLSPORT/$SIPTLSPORT/"
+#!subst "/SIPPORT/$SIPPORT/"
+#!subst "/SIPTLSPORT/$SIPTLSPORT/"
 
 # RTP Engine paramaters
-!subst "/RTPE_SOCKET/$RTPE_SOCKET/"
+#!subst "/RTPE_SOCKET/$RTPE_SOCKET/"
 EOF
 
 # Enable and start Kamailio
