@@ -47,8 +47,8 @@ then
   bash -c 'echo '/usr/sbin/nologin' >> /etc/shells'
 fi
 useradd -s /usr/sbin/nologin $KAMAILIO_USER
-useradd -s /usr/sbin/nologin $RTE_USER
 
+apt-get -y update
 # Install the intially required packages
 apt-get -y install build-essential bison flex git wget
 # RTPEngine Prerequisites
@@ -120,8 +120,8 @@ systemctl restart postgresql
 
 # Set up DB User and DB
 cat > /tmp/sql_user <<SQL_COMMANDS
-CREATE ROLE $SQL_USER WITH PASSWORD '$SQL_PASS' LOGIN;
-CREATE DATABASE $SQL_DB WITH OWNER $SQL_USER;
+CREATE ROLE $DBUSER WITH PASSWORD '$DBPASS' LOGIN;
+CREATE DATABASE $DBNAME WITH OWNER $DBUSER;
 SQL_COMMANDS
 su - -c 'psql -f /tmp/sql_user' postgres
 
@@ -315,4 +315,26 @@ cat <<DONE
 Done, please confim that rtpengine has started correctly.
 INFO: If you are running this in a LXD environment, please be aware:
         You need to reboot now to load the kernel module xt_RTPENGINE
+SETTINGS:
+  DBDRIVER=$DBDRIVER
+  DBHOST=$DBHOST
+  DBUSER=$DBUSER
+  DBPASS=$DBPASS
+  DBNAME=$DBNAME
+  KAMAILIO_USER=$KAMAILIO_USER
+  DBPORT=$DBPORT
+  RTE_USER=$RTE_USER
+  PUBADDR=$PUBADDR
+  PRIVADDR=$PRIVADDR
+  PRIVSUBNET=$PRIVSUBNET
+  PRIVMASK=$PRIVMASK
+  SIPPORT=$SIPPORT
+  SIPTLSPORT=$SIPTLSPORT
+  RTPE_MIN_PORT=$RTPE_MIN_PORT
+  RTPE_MAX_PORT=$RTPE_MAX_PORT
+  RTPE_SOCKET=$RTPE_SOCKET
+  RTPE_KERNEL_MOD=$RTPE_KERNEL_MOD
+  DSTKAMDIR=$DSTKAMDIR
+  SRCDIR=$SRCDIR
+  SRCKAMDIR=$SRCKAMDIR
 DONE
