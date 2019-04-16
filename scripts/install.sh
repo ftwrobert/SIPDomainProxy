@@ -14,11 +14,11 @@
 # on this same LAN.
 
 
-DBDRIVER='postgres'
-DBHOST='127.0.0.1'
-DBUSER=kamailio
-DBPASS=$(< /dev/urandom tr -dc A-Za-z0-9 | head -c20)
-DBNAME=sipdomainproxy
+DB_DRIVER='postgres'
+DB_HOST='127.0.0.1'
+DB_USER=kamailio
+DB_PASS=$(< /dev/urandom tr -dc A-Za-z0-9 | head -c20)
+DB_NAME=sipdomainproxy
 DBPORT=5432
 KAMAILIO_USER=kamailio
 PUBADDR=$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | awk -F'"' '{ print $2}')
@@ -122,8 +122,8 @@ systemctl restart postgresql
 
 # Set up DB User and DB
 cat > /tmp/sql_user <<SQL_COMMANDS
-CREATE ROLE $DBUSER WITH PASSWORD '$DBPASS' LOGIN;
-CREATE DATABASE $DBNAME WITH OWNER $DBUSER;
+CREATE ROLE $DB_USER WITH PASSWORD '$DB_PASS' LOGIN;
+CREATE DATABASE $DB_NAME WITH OWNER $DB_USER;
 SQL_COMMANDS
 su - -c 'psql -f /tmp/sql_user' postgres
 
@@ -138,21 +138,21 @@ make all
 make install
 
 # Kamailio Tables for postgres
-psql -h $DBHOST -U $DBUSER $DBNAME \
+psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/standard-create.sql
-psql -h $DBHOST -U $DBUSER $DBNAME \
+psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/permissions-create.sql
-psql -h $DBHOST -U $DBUSER $DBNAME \
+psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/rtpengine-create.sql
-psql -h $DBHOST -U $DBUSER $DBNAME \
+psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/alias_db-create.sql
-psql -h $DBHOST -U $DBUSER $DBNAME \
+psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/auth_db-create.sql
-psql -h $DBHOST -U $DBUSER $DBNAME \
+psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/domain-create.sql
-psql -h $DBHOST -U $DBUSER $DBNAME \
+psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/usrloc-create.sql
-psql -h $DBHOST -U $DBUSER $DBNAME \
+psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/registrar-create.sql
 
 #!FIXME! Add custom tables for Account, Billing Group, Auth method and DID tracking
@@ -289,11 +289,11 @@ cat > config.cfg <<EOF
 ################################################################################
 
 # Database connectivity
-#!subst "/DBDRIVER/$DBDRIVER/"
-#!subst "/DBHOST/$DBHOST/"
-#!subst "/DBUSER/$DBUSER/"
-#!subst "/DBPASS/$DBPASS/"
-#!subst "/DBNAME/$DBNAME/"
+#!subst "/DB_DRIVER/$DB_DRIVER/"
+#!subst "/DB_HOST/$DB_HOST/"
+#!subst "/DB_USER/$DB_USER/"
+#!subst "/DB_PASS/$DB_PASS/"
+#!subst "/DB_NAME/$DB_NAME/"
 
 # IP Addresses
 #!subst "/PUBADDR/$PUBADDR/"
@@ -316,11 +316,11 @@ Done, please confim that rtpengine has started correctly.
 INFO: If you are running this in a LXD environment, please be aware:
         You need to reboot now to load the kernel module xt_RTPENGINE
 SETTINGS:
-  DBDRIVER=$DBDRIVER
-  DBHOST=$DBHOST
-  DBUSER=$DBUSER
-  DBPASS=$DBPASS
-  DBNAME=$DBNAME
+  DB_DRIVER=$DB_DRIVER
+  DB_HOST=$DB_HOST
+  DB_USER=$DB_USER
+  DB_PASS=$DB_PASS
+  DB_NAME=$DB_NAME
   KAMAILIO_USER=$KAMAILIO_USER
   DBPORT=$DBPORT
   RTE_USER=$RTE_USER

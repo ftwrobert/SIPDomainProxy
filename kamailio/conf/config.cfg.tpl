@@ -5,11 +5,11 @@
 ################################################################################
 
 # Database connectivity
-#!subst "/DBDRIVER//"
-#!subst "/DBHOST//"
-#!subst "/DBUSER//"
-#!subst "/DBPASS//"
-#!subst "/DBNAME//"
+#!subst "/DB_DRIVER//"
+#!subst "/DB_HOST//"
+#!subst "/DB_USER//"
+#!subst "/DB_PASS//"
+#!subst "/DB_NAME//"
 
 # IP Addresses
 #!subst "/PUBADDR//"
