@@ -301,10 +301,6 @@ cat > config.cfg <<EOF
 #!subst "/PRIVSUBNET/$PRIVSUBNET/"
 #!subst "/PRIVMASK/$PRIVMASK/"
 
-# Kamailio Ports
-#!subst "/SIPPORT/$SIPPORT/"
-#!subst "/SIPTLSPORT/$SIPTLSPORT/"
-
 # RTP Engine paramaters
 #!subst "/RTPE_SOCKET/$RTPE_SOCKET/"
 EOF
