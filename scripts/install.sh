@@ -200,14 +200,14 @@ CREATE TABLE customer_auth (
 -- We prevent deletion rather then cascade delete because we are not going to
 -- modify tables that are created and managed by kamailio
 
-CREATE FUNCTION is_customer_auth_deletable()
+CREATE OR REPLACE FUNCTION is_customer_auth_deletable()
 RETURNS TRIGGER
 AS \$\$
 BEGIN
   IF (OLD.subscriber_id IS NULL AND OLD.trusted_id IS NULL) THEN
     RETURN OLD;
   END IF;
-  RETURN NULL;
+  RAISE EXCEPTION 'subscriber_id AND trusted_id must be NULL';
 END;
 \$\$
 LANGUAGE plpgsql;
@@ -325,7 +325,6 @@ systemctl mask ngcp-rtpengine-daemon
 systemctl enable rtpengine
 echo "starting rtpengine"
 systemctl start rtpengine
-systemctl status rtpengine
 
 # Kamailio Startup Script
 cat > /lib/systemd/system/kamailio.service <<END_OF_UNIT_FILE
