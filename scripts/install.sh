@@ -131,7 +131,7 @@ su - -c 'psql -f /tmp/sql_user' postgres
 cd /usr/src
 git clone https://github.com/kamailio/kamailio.git kamailio
 cd kamailio
-git checkout -b 5.2 origin/5.2
+git checkout -b 5.0 origin/5.0
 # and Install
 make FLAVOUR=kamailio include_modules="db_postgres" cfg
 make all
