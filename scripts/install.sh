@@ -32,7 +32,7 @@ SIPPORT='5060'
 SIPTLSPORT='5061'
 RTPE_MIN_PORT='52000'
 RTPE_MAX_PORT='54024'
-RTPE_SOCKET='127.0.0.1:2223'
+RTPE_SOCKET='udp:127.0.0.1:2223'
                   # Assuming we're installing on a LXD host
                   # The xt_RTPENGINE kernel module should already be loaded.
 RTPE_KERNEL_MOD=0 # Set to 1 if installing in a VM or a dedicated host.
