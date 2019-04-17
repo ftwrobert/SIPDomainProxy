@@ -157,6 +157,77 @@ psql -h $DB_HOST -U $DB_USER $DB_NAME \
 
 #!FIXME! Add custom tables for Account, Billing Group, Auth method and DID tracking
 
+cat > "/tmp/SIPDomainProxy.schema" <<EOF
+
+-- Customer account information
+
+CREATE TABLE customer (
+  id    SERIAL PRIMARY KEY,
+  descr VARCHAR(64) NOT NULL
+);
+
+
+-- Billing groups provide a common billing subscriber for multiple authorization
+-- methods. The pai inheritance tree begins here.
+
+CREATE TABLE customer_bg (
+  id          SERIAL PRIMARY KEY,
+  customer_id INTEGER NOT NULL REFERENCES customer ON DELETE CASCADE,
+  descr       VARCHAR(64) NOT NULL,
+  pai         VARCHAR(64) NOT NULL
+);
+
+-- Middle man table between customer billing groups and
+-- (subscriber|trusted|domain) tables.
+CREATE TABLE customer_auth (
+  id             SERIAL PRIMARY KEY,
+  customer_bg_id INTEGER NOT NULL REFERENCES customer_bg ON DELETE CASCADE,
+  domain_id      INTEGER NOT NULL REFERENCES domain ON DELETE RESTRICT,
+  pai            VARCHAR(64),
+  priority       INTEGER NOT NULL DEFAULT 0,
+  subscriber_id  INTEGER REFERENCES subscriber ON DELETE SET NULL,
+  trusted_id     INTEGER REFERENCES trusted ON DELETE SET NULL,
+  CHECK (
+        (subscriber_id IS NOT NULL AND trusted_id    IS NULL)
+     OR (trusted_id    IS NOT NULL AND subscriber_id IS NULL)
+     OR (subscriber_id IS     NULL AND trusted_id    IS NULL)
+  )
+);
+
+
+-- Prevent deletion of customer_auth unless both trusted_id and subscriber_id
+-- are NULL
+-- We prevent deletion rather then cascade delete because we are not going to
+-- modify tables that are created and managed by kamailio
+
+CREATE FUNCTION is_customer_auth_deletable()
+RETURNS TRIGGER
+AS \$\$
+BEGIN
+  IF (OLD.subscriber_id IS NULL AND OLD.trusted_id IS NULL) THEN
+    RETURN OLD;
+  END IF;
+  RETURN NULL;
+END;
+\$\$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_is_customer_auth_deletable
+BEFORE DELETE ON customer_auth
+  FOR EACH ROW EXECUTE PROCEDURE is_customer_auth_deletable();
+
+
+-- Inboud numbers to be assoicated with a billing group and final override on pai
+CREATE TABLE alias_pai (
+  id             SERIAL PRIMARY KEY,
+  dbaliases_id   INTEGER NOT NULL UNIQUE REFERENCES dbaliases ON DELETE CASCADE,
+  customer_bg_id INTEGER NOT NULL REFERENCES customer_bg ON DELETE CASCADE,
+  pai            VARCHAR(64)
+);
+EOF
+# import SIPDomainProxy tables into postgres
+psql -h $DB_HOST -U $DB_USER $DB_NAME -f /tmp/SIPDomainProxy.schema
+
 # Download RTPEngine
 mkdir -p /usr/src/rtpengine
 cd /usr/src/rtpengine
