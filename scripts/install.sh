@@ -53,6 +53,11 @@ useradd -s /usr/sbin/nologin $KAMAILIO_USER
 apt-get -y update
 # Install the intially required packages
 apt-get -y install build-essential bison flex git wget
+# Install the perl packages that we will need
+apt-get -y install perl-doc libmodern-perl-perl \
+                   libgetopt-long-descriptive-perl libclass-dbi-perl \
+                   libclass-dbi-pg-perl libtext-table-perl libnetaddr-ip-perl \
+                   libdata-validate-domain-perl
 # RTPEngine Prerequisites
 apt-get -y install dpkg-dev debhelper default-libmysqlclient-dev \
                    libmysqlclient-dev gperf iptables-dev libavcodec-dev \
@@ -74,7 +79,7 @@ wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
 sudo apt-get update
 
 # Install Postgres 10
-apt-get -y install postgresql-10 postgresql-server-dev-10
+apt-get -y install postgresql-10 postgresql-server-dev-10 postgresql-10-prefix
 
 # Setup PostgreSQL
 PSQLDIR='/etc/postgresql/10/main'
@@ -125,7 +130,13 @@ cat > /tmp/sql_user <<SQL_COMMANDS
 CREATE ROLE $DB_USER WITH PASSWORD '$DB_PASS' LOGIN;
 CREATE DATABASE $DB_NAME WITH OWNER $DB_USER;
 SQL_COMMANDS
+cat > /tmp/sql_prefix <<END_OF_SQL_COMMANDS
+CREATE EXTENSION prefix;
+CREATE CAST (text as prefix_range) WITH FUNCTION prefix_range(text) AS IMPLICIT;
+CREATE CAST (prefix_range as text) WITH FUNCTION text(prefix_range);
+END_OF_SQL_COMMANDS
 su - -c 'psql -f /tmp/sql_user' postgres
+su - -c "psql $DB_NAME -f /tmp/sql_prefix" postgres
 
 # Download Kamailio
 cd /usr/src
@@ -218,10 +229,10 @@ BEFORE DELETE ON customer_auth
 
 
 -- Inboud numbers to be assoicated with a billing group and final override on pai
-CREATE TABLE alias_pai (
+CREATE TABLE did_numbers (
   id             SERIAL PRIMARY KEY,
-  dbaliases_id   INTEGER NOT NULL UNIQUE REFERENCES dbaliases ON DELETE CASCADE,
   customer_bg_id INTEGER NOT NULL REFERENCES customer_bg ON DELETE CASCADE,
+  prefix         prefix_range NOT NULL UNIQUE,
   pai            VARCHAR(64)
 );
 EOF

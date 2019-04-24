@@ -1,0 +1,969 @@
+#!/usr/bin/env perl
+# Quick Admin
+################################################################################
+# Title:  SIPDomainProxy
+# Author: Robert J. Ebel
+################################################################################
+use Modern::Perl '2015';
+use Getopt::Long 'HelpMessage';
+use DBI;
+use Text::Table;
+use Cwd;
+use NetAddr::IP;
+use Data::Validate::Domain 'is_domain';
+
+use Data::Dumper;
+
+my $description = 'Quickly manage SIPDomainProxy.';
+
+my $helpmsg = <<EOF;
+Usage:
+  $0 OPTION (add|list|rm) SUBOPTIONS
+
+  OPTIONS
+
+  --domain add SUBOPTIONS
+    SUBOPTIONS
+      addr=PBX_IP_ADDR
+      authtype=(passthrough|local)
+      fqdn=FQDN
+      sipport=PBX_SIP_PORT
+
+  --domain list
+
+  --domain rm (FQDN|ID)
+
+  --customer add NAME
+
+  --customer list
+
+  --customer rm ID
+
+  --billing_group add SUBOPTIONS
+    SUBOPTIONS
+      customer=ID
+      descr=DESCRIPTION
+      pai=P-ASSERTED-IDENTITY
+
+  --billing_group list SUBOPTIONS
+    SUBOPTIONS
+      [ customer=ID ]
+
+  --billing_group rm ID
+
+  --auth add type=TYPE SUBOPTIONS
+    TYPE=(digest|trusted)
+      digest
+        SUBOPTIONS
+          bg=ID
+          fqdn=(FQDN|ID)
+          username=USERNAME
+          [ pai=P-ASSERTED-IDENTITY ]
+          [ password=PASSWORD ]
+          [ priority=N ]
+      trusted
+        SUBOPTIONS
+          addr=IP_ADDR
+          bg=ID
+          fqdn=(FQDN|ID)
+          [ pai=P-ASSERTED-IDENTITY ]
+          [ priority=N ]
+
+  --auth list SUBOPTIONS
+    SUBOPTIONS
+      [ customer=ID | bg=ID ]
+
+  --auth rm ID
+
+  --number add SUBOPTIONS
+    SUBOPTIONS
+      bg=ID
+      [ pai=P-ASSERTED-IDENTITY ]
+      range=RANGEFMT
+        RANGEFMT is a comma seperated list of the following regular expressions
+          [0-9]{10}             - A single 10-Digit number
+          [0-9]{10}-[0-9]{10}   - All numbers between two 10-Digit numbers
+          [0-9]{10}+[0-9]{1,3}  - All numbers starting with a 10-Digit number
+                                  and couting upwords
+
+  --number list SUBOPTIONS
+    SUBOPTIONS
+      [ customer=ID ]
+
+  --number rm SUBOPTIONS
+    SUBOPTIONS
+      bg=ID
+      range=RANGEFMT
+        RANGEFMT is a comma seperated list of the following regular expressions
+          [0-9]{10}             - A single 10-Digit number
+          [0-9]{10}-[0-9]{10}   - All numbers between two 10-Digit numbers
+          [0-9]{10}+[0-9]{1,3}  - All numbers starting with a 10-Digit number
+                                  and couting upwords
+EOF
+
+our $errmsg = "Unable to process arguments\r\n\r\n" . $helpmsg;
+
+our ($option, $action, $opts);
+GetOptions(
+  'auth=s{1,}'        => \&processOptions,
+  'customer=s{1,}'    => \&processOptions,
+  'billing_group=s{1,}' => \&processOptions,
+  'domain=s{1,}'      => \&processOptions,
+  'number=s{1,}'      => \&processOptions,
+);
+
+sub processOptions {
+  my ($opt_name, $opt_val) = @_;
+  $main::option = '' . $opt_name;
+  if (!defined $main::action) {
+    $main::action = $opt_val;
+  }
+  else {
+    my ($key, $val) = split '=', $opt_val, 2;
+    $main::opts->{$key} = $val;
+  }
+  die('!FINISH'); # Tells Getopt to stop processing after the first match
+}
+
+my $db_driver_re  = '^#!subst "/DB_DRIVER/(.*?)/"$';
+my $db_host_re    = '^#!subst "/DB_HOST/(.*?)/"$';
+my $db_user_re    = '^#!subst "/DB_USER/(.*?)/"$';
+my $db_pass_re    = '^#!subst "/DB_PASS/(.*?)/"$';
+my $db_name_re    = '^#!subst "/DB_NAME/(.*?)/"$';
+my $privsubnet_re = '^#!subst "/PRIVSUBNET/(.*?)/"$';
+my $privmask_re   = '^#!subst "/PRIVMASK/(.*?)/"$';
+my ($db_driver, $db_host, $db_user, $db_pass, $db_name);
+our ($privsubnet, $privmask);
+my $configfile = getcwd . '/../kamailio/conf/config.cfg';
+if (! -s $configfile ) {
+  die('Unable to open config file. Have you ran the installation script?');
+}
+
+open (my $fh, '<:encoding(UTF-8)', $configfile)
+  or die('Unable to open config file.');
+
+while (my $line = <$fh>) {
+  chomp $line;
+  if (! defined $db_driver && $line =~ /$db_driver_re/) {
+    if ($1 eq 'postgres') {$db_driver = 'Pg';}
+    next;
+  }
+  if (! defined $db_host && $line =~ /$db_host_re/) {
+    $db_host = $1;
+    next;
+  }
+  if (! defined $db_user && $line =~ /$db_user_re/) {
+    $db_user = $1;
+    next;
+  }
+  if (! defined $db_pass && $line =~ /$db_pass_re/) {
+    $db_pass = $1;
+    next;
+  }
+  if (! defined $db_name && $line =~ /$db_name_re/) {
+    $db_name = $1;
+    next;
+  }
+  if (! defined $privsubnet && $line =~ /$privsubnet_re/) {
+    $privsubnet = $1;
+    next;
+  }
+  if (! defined $privmask && $line =~ /$privmask_re/) {
+    $privmask = $1;
+    next;
+  }
+  if (   defined $db_driver && defined $db_host && defined $db_user
+      && defined $db_pass   && defined $db_name && defined $privsubnet
+      && defined $privmask ) {
+    last;
+  }
+}
+
+if (    ! defined $db_driver || ! defined $db_name || ! defined $db_host
+     || ! defined $db_user   || ! defined $db_pass || ! defined $privsubnet
+     || ! defined $privmask) {
+  die('Invalid configuration, please check ' . $configfile);
+}
+
+my $dsn = "dbi:$db_driver:dbname=$db_name;host=$db_host";
+my $dbh = DBI->connect($dsn, $db_user, $db_pass);
+die ("$DBI::err \n\n $DBI::errstr \n\n $! \n\n") unless $dbh;
+
+# For each option and for each action, call the respective subroutine
+if (! defined $option) {
+  die($errmsg);
+}
+elsif ($option eq 'auth') {
+  if    ($action eq 'add') {
+    auth_add($opts);
+  }
+  elsif ($action eq 'list') {
+    auth_list($opts);
+  }
+  elsif ($action eq 'rm') {
+    auth_rm($opts);
+  }
+  else {
+    die($errmsg);
+  }
+}
+elsif ($option eq 'customer') {
+  if    ($action eq 'add') {
+    customer_add($opts);
+  }
+  elsif ($action eq 'list') {
+    customer_list($dbh);
+  }
+  elsif ($action eq 'rm') {
+    customer_rm($opts);
+  }
+  else {
+    die($errmsg);
+  }
+}
+elsif ($option eq 'billing_group') {
+  if    ($action eq 'add') {
+    billing_group_add($opts);
+  }
+  elsif ($action eq 'list') {
+    billing_group_list($opts);
+  }
+  elsif ($action eq 'rm') {
+    billing_group_rm($opts);
+  }
+  else {
+    die($errmsg);
+  }
+}
+elsif ($option eq 'domain') {
+  if    ($action eq 'add') {
+    domain_add($opts);
+  }
+  elsif ($action eq 'list') {
+    domain_list($dbh);
+  }
+  elsif ($action eq 'rm') {
+    domain_rm($opts);
+  }
+  else {
+    die($errmsg);
+  }
+}
+elsif ($option eq 'number') {
+  if    ($action eq 'add') {
+    number_add($opts);
+  }
+  elsif ($action eq 'list') {
+    number_list($opts);
+  }
+  elsif ($action eq 'rm') {
+    number_rm($opts);
+  }
+  else {
+    die($errmsg);
+  }
+}
+else {
+  die($errmsg);
+}
+
+sub auth_add {
+  my $opts = shift;
+  # attributes common to both types
+  unless (exists $opts->{'bg'} && $opts->{'bg'} =~ /^\d+$/) {
+    die("Invalid bg paramater\n" . $main::errmsg);
+  }
+  my $domsth;
+  if (exists $opts->{'fqdn'} && is_domain($opts->{'fqdn'})) {
+    $domsth = $dbh->prepare(qq{
+SELECT id FROM domain WHERE domain = ?;
+    });
+  }
+  elsif (exists $opts->{'fqdn'} && $opts->{'fqdn'} =~ /^\d+$/) {
+    $domsth = $dbh->prepare(qq{
+SELECT id FROM domain WHERE id = ?;
+    });
+  }
+  my $domrc = $domsth->execute($opts->{'fqdn'});
+  if ($domrc) {
+    if (my $row = $domsth->fetchrow_hashref) {
+      $opts->{'fqdn'} = $row->{id};
+    }
+    else {
+      die("An unexpected error has occured, Unable to verify domain");
+    }
+  }
+  else {
+    die("Invalid fqdn paramater\n" . $main::errmsg);
+  }
+  unless (exists $opts->{'pai'}) {
+    $opts->{'pai'} = undef;
+  }
+  if (exists $opts->{'priority'} && $opts->{'priority'} !~ /^\d+$/) {
+    $opts->{'priority'} = 0;
+  }
+  elsif (! exists $opts->{'priority'}) {
+    $opts->{'priority'} = 0;
+  }
+
+  if (defined $opts->{'type'} && $opts->{'type'} eq 'digest') {
+    unless (exists $opts->{'username'}) {
+      die("Invalid username paramater\n" . $main::errmsg);
+    }
+    unless (exists $opts->{'password'}) {
+      my @chars = ('a'..'z', 'A'..'Z', 0..9);
+      $opts->{'password'} = join '', map $chars[rand @chars], 0..15;
+    }
+
+    $dbh->begin_work;
+    my $substh = $dbh->prepare(qq{
+INSERT INTO subscriber
+(username, domain, password)
+VALUES (?, (SELECT domain FROM domain WHERE id = ?), ?);
+    });
+    my $s1 = $substh->execute($opts->{'username'},
+                              $opts->{'fqdn'},
+                              $opts->{'password'});
+    if (! $s1) {
+      $dbh->rollback();
+      die("An unexpected error has occured, Unable to add subscriber");
+    }
+
+    my $subid = $dbh->last_insert_id(undef, undef, 'subscriber', undef);
+
+    if (! $subid) {
+      $dbh->rollback();
+      die("An unexpected error has occured, Unable to add auth");
+    }
+
+    my $authsth = $dbh->prepare(qq{
+INSERT INTO customer_auth
+(customer_bg_id, domain_id, pai, priority, subscriber_id)
+VALUES (?, ?, ?, ?, ?);
+    });
+    my $s2 = $authsth->execute($opts->{'bg'},
+                               $opts->{'fqdn'},
+                               $opts->{'pai'},
+                               $opts->{'priority'},
+                               $subid);
+    if ($s2) {
+      my $s3 = $dbh->commit;
+      if ($s3) {
+        say "Authorization successfully added";
+        exit 0;
+      }
+    }
+    $dbh->rollback();
+    die("An unexpected error has occured, Unable to add authorization");
+  }
+  elsif (defined $opts->{'type'} && $opts->{'type'} eq 'trusted') {
+    my $ip = new NetAddr::IP $opts->{'addr'};
+    unless ($ip) {
+      die("Invalid addr paramater\n" . $main::errmsg);
+    }
+    $dbh->begin_work;
+    my $trusth = $dbh->prepare(qq{
+INSERT INTO trusted
+(src_ip, proto)
+VALUES (?, 'any');
+    });
+    my $s1 = $trusth->execute($opts->{'addr'});
+    if (! $s1) {
+      $dbh->rollback();
+      die("An unexpected error has occured, Unable to add trusted addr");
+    }
+
+    my $trustid = $dbh->last_insert_id(undef, undef, 'trusted', undef);
+
+    if (! $trustid) {
+      $dbh->rollback();
+      die("An unexpected error has occured, Unable to add auth");
+    }
+
+    my $authsth = $dbh->prepare(qq{
+INSERT INTO customer_auth
+(customer_bg_id, domain_id, pai, priority, trusted_id)
+VALUES (?, ?, ?, ?, ?);
+    });
+    my $s2 = $authsth->execute($opts->{'bg'},
+                               $opts->{'fqdn'},
+                               $opts->{'pai'},
+                               $opts->{'priority'},
+                               $trustid);
+   if ($s2) {
+     my $s3 = $dbh->commit;
+     if ($s3) {
+       say "Authorization successfully added";
+       exit 0;
+     }
+   }
+   $dbh->rollback();
+   die("An unexpected error has occured, Unable to add authorization");
+  }
+  else {
+    die("Invalid type paramater\n" . $main::errmsg);
+  }
+}
+
+sub auth_list {
+  my $opts = shift;
+  my $sqlwhere = '';
+  my $sqlparam;
+  if (exists $opts->{'bg'} && exists $opts->{'customer'}) {
+    die("Invalid customer|bg paramater\n" . $main::errmsg);
+  }
+  if (exists $opts->{'bg'} && $opts->{'bg'} =~ /^\d+$/) {
+    $sqlwhere = 'WHERE customer_bg.id = ?';
+    $sqlparam = $opts->{'bg'};
+  }
+  elsif (exists $opts->{'customer'} && $opts->{'customer'} =~ /^\d+$/) {
+    $sqlwhere = 'WHERE customer.id = ?';
+    $sqlparam = $opts->{'customer'};
+  }
+  my $sqlauthwhere;
+  if ($sqlwhere) {
+    $sqlauthwhere = 'AND customer_auth.id IS NOT NULL';
+  }
+  else {
+    $sqlauthwhere = 'WHERE customer_auth.id IS NOT NULL';
+  }
+  my $sth = $dbh->prepare(qq{
+SELECT customer.id as customer_id,
+       customer.descr as customer,
+       customer_bg.id as customer_bg_id,
+       customer_bg.descr as billing_group,
+       customer_auth.id as auth_id,
+       customer_auth.pai as pai,
+       customer_auth.priority as priority,
+       CONCAT_WS('\@', CONCAT_WS(':', subscriber.username, subscriber.password), subscriber.domain) as subscriber,
+       trusted.src_ip as trusted_addr,
+       domain.domain
+FROM customer_auth
+LEFT JOIN customer_bg ON customer_auth.customer_bg_id=customer_bg.id
+LEFT JOIN customer ON customer_bg.customer_id=customer.id
+LEFT JOIN subscriber ON customer_auth.subscriber_id=subscriber.id
+LEFT JOIN trusted ON customer_auth.trusted_id=trusted.id
+LEFT JOIN domain on customer_auth.domain_id=domain.id
+$sqlwhere
+$sqlauthwhere;
+  });
+  if ($sqlwhere) {
+    $sth->execute($sqlparam);
+  }
+  else {
+    $sth->execute();
+  }
+  my $tb = Text::Table->new(
+    \'| ', {title => 'Auth ID'},
+    \' | ', {title => 'Customer'},
+    \' | ', {title => 'Billing Group'},
+    \' | ', {title => 'Domain'},
+    \' | ', {title => 'P-Asserted-Identity'},
+    \' | ', {title => 'Subscriber'},
+    \' | ', {title => 'Trusted ADDR'},
+    \' | ', {title => 'Priority'},
+    \' |'
+  );
+  while (my $row = $sth->fetchrow_hashref) {
+    $tb->load([$row->{auth_id},      $row->{customer}, $row->{billing_group},
+               $row->{domain},       $row->{pai},      $row->{subscriber},
+               $row->{trusted_addr}, $row->{priority}, ]);
+  }
+  print $tb->body_rule('-', '+');
+  print $tb->title();
+  print $tb->rule('-', '+');
+  for ($tb->body()) {
+    print $_;
+    print $tb->body_rule('-', '+');
+  }
+}
+
+sub auth_rm {
+  my $opts = shift;
+  my @keys = keys %$opts;
+  if (@keys == 1) {
+    my $key = $keys[0];
+    if ($key =~ /^\d+$/) {
+      $dbh->begin_work;
+      my $substh = $dbh->prepare(qq{
+DELETE FROM subscriber
+WHERE id IN (
+             SELECT subscriber_id
+             FROM customer_auth
+             WHERE id = ?
+            );
+      });
+      my $trusth = $dbh->prepare(qq{
+DELETE FROM trusted
+WHERE id IN (
+             SELECT trusted_id
+             FROM customer_auth
+             WHERE id = ?
+            );
+      });
+      my $authsth = $dbh->prepare(qq{
+DELETE FROM customer_auth
+WHERE id = ?;
+      });
+      my $s1 = $substh->execute($key);
+      my $s2 = $trusth->execute($key);
+      my $s3 = $authsth->execute($key);
+      if ($s1 && $s2 && $s3) {
+        my $s4 = $dbh->commit;
+        if ($s4) {
+          say "Auth $key successfully removed";
+          exit 0;
+        }
+      }
+      else {
+        $dbh->rollback();
+        die("An unexpected error has occured, Unable to remove auth $key");
+      }
+    }
+  }
+  die("Invalid ID paramater\n" . $main::errmsg);
+}
+
+sub customer_add {
+  my $opts = shift;
+  my @keys = keys %$opts;
+  if (@keys == 1) {
+    my $name = $keys[0];
+    my $sth = $dbh->prepare(qq{
+  INSERT INTO customer (descr) VALUES (?);
+  });
+    my $rc = $sth->execute($name);
+    if ($rc) {
+      say "Successfully added customer: $name";
+      exit 0;
+    }
+    else {
+      die('An unexpected error has occured, Unable to add customer');
+    }
+  }
+  die("Invalid ID paramater\n" . $main::errmsg);
+}
+
+sub customer_list {
+  my $sth = $dbh->prepare(qq{
+SELECT id, descr
+FROM customer;
+  });
+  $sth->execute();
+  my $tb = Text::Table->new(
+    \'| ',  {title => 'ID'},
+    \' | ', {title => 'Customer'},
+    \' |'
+  );
+  while (my $row = $sth->fetchrow_hashref) {
+    $tb->load([$row->{id}, $row->{descr}]);
+  }
+  print $tb->body_rule('-', '+');
+  print $tb->title();
+  print $tb->rule('-', '+');
+  for ($tb->body()) {
+    print $_;
+    print $tb->body_rule('-', '+');
+  }
+}
+
+sub customer_rm {
+  my $opts = shift;
+  my @keys = keys %$opts;
+  if (@keys == 1) {
+    my $key = $keys[0];
+    if ($key =~ /^\d+$/) {
+      my $sth = $dbh->prepare(qq{
+DELETE FROM customer
+WHERE id = ?;
+      });
+      my $s1 = $sth->execute($key);
+      if ($s1) {
+        say "Customer $key successfully removed";
+        exit 0;
+      }
+      else {
+        die("An unexpected error has occured, Unable to remove customer $key");
+      }
+    }
+  }
+  die("Invalid ID paramater\n" . $main::errmsg);
+}
+
+sub billing_group_add {
+  my $opts = shift;
+  unless (exists $opts->{'customer'} && $opts->{'customer'} =~ /^\d+$/) {
+    die("Invalid customer paramater\n" . $main::errmsg);
+  }
+
+  unless (exists $opts->{'descr'}) {
+    die("Invalid descr paramater\n" . $main::errmsg);
+  }
+
+  unless (exists $opts->{'pai'} && $opts->{'pai'} =~ /^\d+$/) {
+    die("Invalid pai paramater\n" . $main::errmsg);
+  }
+
+  # if we're still here, we have all of our arguments.
+
+  my $sth = $dbh->prepare(qq{
+INSERT INTO customer_bg (customer_id, descr, pai)
+VALUES (?, ?, ?);
+  });
+  my $s1 = $sth->execute($opts->{'customer'}, $opts->{'descr'}, $opts->{'pai'});
+  if ($s1) {
+    say 'Billing group added';
+  }
+  else {
+    die('An unexpected error has occured, Unable to add billing group');
+  }
+}
+
+sub billing_group_list {
+  my $opts = shift;
+  my $sqlwhere = '';
+  if (exists $opts->{'customer'} && $opts->{'customer'} =~ /^\d+$/) {
+    $sqlwhere = 'WHERE customer.id = ?';
+  }
+  my $sth = $dbh->prepare(qq{
+select customer.id as customer_id,
+       customer.descr as customer,
+       customer_bg.id as customer_bg_id,
+       customer_bg.descr as billing_group,
+       customer_bg.pai as pai
+FROM customer
+LEFT JOIN customer_bg
+ON customer.id=customer_bg.customer_id
+$sqlwhere;
+  });
+  if ($sqlwhere) {
+    $sth->execute($opts->{'customer'});
+  }
+  else {
+    $sth->execute();
+  }
+  my $tb = Text::Table->new(
+    \'| ',  {title => 'Customer ID'},
+    \' | ', {title => 'Customer'},
+    \' | ', {title => 'Billing Group ID'},
+    \' | ', {title => 'Billing Group'},
+    \' | ', {title => 'P-Asserted-Identity'},
+    \' |'
+  );
+  while (my $row = $sth->fetchrow_hashref) {
+    $tb->load([$row->{customer_id},   $row->{customer}, $row->{customer_bg_id},
+               $row->{billing_group}, $row->{pai}]);
+  }
+  print $tb->body_rule('-', '+');
+  print $tb->title();
+  print $tb->rule('-', '+');
+  for ($tb->body()) {
+    print $_;
+    print $tb->body_rule('-', '+');
+  }
+}
+
+sub billing_group_rm {
+  my $opts = shift;
+  my @keys = keys %$opts;
+  if (@keys == 1) {
+    my $key = $keys[0];
+    if ($key =~ /^\d+$/) {
+      my $sth = $dbh->prepare(qq{
+DELETE FROM customer_bg
+WHERE id = $key;
+      });
+      my $s1 = $sth->execute();
+      if ($s1) {
+        say "Billing Group $key successfully removed";
+        exit 0;
+      }
+      else {
+        die("An unexpected error has occured, Unable to remove Billing Group $key");
+      }
+    }
+  }
+  die("Invalid ID paramater\n" . $main::errmsg);
+}
+
+sub domain_add {
+  my $opts = shift;
+  if (! exists $opts->{'addr'}) { # required arg
+    die("Invalid addr paramater\n" . $main::errmsg);
+  }
+  my $ip = new NetAddr::IP $opts->{'addr'};
+  unless (   $ip # validation
+          && $ip->within(new NetAddr::IP $main::privsubnet, $main::privmask)) {
+    die("Invalid addr paramater\n" . $main::errmsg);
+  }
+
+  unless (exists $opts->{'authtype'} # required arg, validation included
+          && (    $opts->{'authtype'} eq 'passthrough'
+               || $opts->{'authtype'} eq 'local')) {
+    die("Invalid authtype paramater\n" . $main::errmsg);
+  }
+
+  unless (exists $opts->{'fqdn'} && is_domain($opts->{'fqdn'})) { # required arg
+    die("Invalid fqdn paramater\n" . $main::errmsg);       # validation included
+  }
+
+  if (   ! exists $opts->{'sipport'}
+      || (    $opts->{'sipport'} =~ /^\d+$/
+           && $opts->{'sipport'} >  0
+           && $opts->{'sipport'} <= 65535)) {
+    $opts->{'sipport'} = '5060';
+  }
+
+  # if we're still here, we have all of our arguments.
+
+  my $dsth = $dbh->prepare(qq{
+INSERT INTO domain (domain, last_modified)
+VALUES (?, now());
+  });
+  my $dstatus = $dsth->execute($opts->{'fqdn'});
+  if (! $dstatus) {
+    die('An unexpected error has occured, Unable to add domain');
+  }
+  my $dasth = $dbh->prepare(qq{
+INSERT INTO domain_attrs (did, name, type, value, last_modified)
+VALUES (?, ?, 2, ?, now());
+  });
+  my $s1 = $dasth->execute($opts->{'fqdn'},
+                           'authtype',
+                           $opts->{'authtype'});
+  my $s2 = $dasth->execute($opts->{'fqdn'},
+                           'pbx_addr',
+                           $opts->{'addr'});
+  my $s3 = $dasth->execute($opts->{'fqdn'},
+                           'pbx_sipport',
+                           $opts->{'sipport'});
+  if ($s1 && $s2 && $s3) {
+    say 'Domain added successfully';
+  }
+  else {
+    die('An unexpected error has occured, Unable to add domain attributes');
+  }
+}
+
+sub domain_list {
+  my $sth = $dbh->prepare(qq{
+SELECT domain.id, domain.domain, domain_attrs.name, domain_attrs.value
+FROM domain
+LEFT JOIN domain_attrs ON domain.domain=domain_attrs.did;
+  });
+  $sth->execute();
+  my $tb = Text::Table->new(
+    \'| ',  {title => 'ID'},
+    \' | ', {title => 'Domain'},
+    \' | ', {title => 'Attribute'},
+    \' | ', {title => 'Value'},
+    \' |'
+  );
+  while (my $row = $sth->fetchrow_hashref) {
+    $tb->load([$row->{id}, $row->{domain}, $row->{name}, $row->{value}]);
+  }
+  print $tb->body_rule('-', '+');
+  print $tb->title();
+  print $tb->rule('-', '+');
+  for ($tb->body()) {
+    print $_;
+    print $tb->body_rule('-', '+');
+  }
+}
+
+sub domain_rm {
+  my $opts = shift;
+  my @keys = keys %$opts;
+  if (@keys == 1) {
+    my $key = $keys[0];
+    if (is_domain($key)) {
+      $dbh->begin_work
+        or die('An unexpected error has occured, Unable to remove domain');
+      my $dsth = $dbh->prepare(qq{
+DELETE FROM domain WHERE domain = '?';
+      });
+      my $s1 = $dsth->execute($key);
+      my $dasth = $dbh->prepare(qq{
+DELETE FROM domain_attrs WHERE did = '?';
+      });
+      my $s2 = $dasth->execute($key);
+      if ($s1 && $s2) {
+        my $s3 = $dbh->commit;
+        if ($s3) {
+          say "Domain $key successfully removed";
+          exit 0;
+        }
+      }
+      else {
+        $dbh->rollback();
+        die("An unexpected error has occured, Unable to remove domain");
+      }
+    }
+    elsif ($key =~ /^\d+$/) {
+      $dbh->begin_work
+        or die('An unexpected error has occured, Unable to remove domain');
+      my $dasth = $dbh->prepare(qq{
+DELETE FROM domain_attrs
+WHERE did IN (SELECT domain
+              FROM domain WHERE id = ?);
+      });
+      my $s1 = $dasth->execute($key);
+      my $dsth = $dbh->prepare(qq{
+DELETE FROM domain WHERE id = ?;
+      });
+      my $s2 = $dsth->execute($key);
+      if ($s1 && $s2) {
+        my $s3 = $dbh->commit;
+        if ($s3) {
+          say "Domain $key successfully removed";
+          exit 0;
+        }
+      }
+      else {
+        $dbh->rollback();
+        die("An unexpected error has occured, Unable to remove domain");
+      }
+    }
+  }
+  die("Invalid ID|FQDN paramater\n" . $main::errmsg);
+}
+
+sub number_add {
+  my $opts = shift;
+  unless (exists $opts->{'bg'} && $opts->{'bg'} =~ /^\d+$/) {
+    die("Invalid bg paramater\n" . $main::errmsg);
+  }
+  unless (exists $opts->{'range'}) {
+    die("Invalid prefix paramater\n" . $main::errmsg);
+  }
+  unless (exists $opts->{'pai'}) {
+    $opts->{'pai'} = undef;
+  }
+  my $sth = $dbh->prepare(qq{
+INSERT INTO did_numbers
+(customer_bg_id, pai, prefix)
+VALUES (?, ?, ?);
+  });
+  foreach my $prefix (parse_number_re($opts->{'range'})) {
+    my $rc = $sth->execute($opts->{'bg'}, $opts->{'pai'}, $prefix);
+    if ($rc) {
+      say "Added $prefix";
+    }
+    else {
+      say "Unable to add $prefix";
+    }
+  }
+}
+
+sub number_list {
+  my $opts = shift;
+  my $sqlwhere = '';
+  my $sqlparam;
+  if (exists $opts->{'bg'} && exists $opts->{'customer'}) {
+    die("Invalid customer|bg paramater\n" . $main::errmsg);
+  }
+  if (exists $opts->{'bg'} && $opts->{'bg'} =~ /^\d+$/) {
+    $sqlwhere = 'WHERE customer_bg.id = ?';
+    $sqlparam = $opts->{'bg'};
+  }
+  elsif (exists $opts->{'customer'} && $opts->{'customer'} =~ /^\d+$/) {
+    $sqlwhere = 'WHERE customer.id = ?';
+    $sqlparam = $opts->{'customer'};
+  }
+  my $sth = $dbh->prepare(qq{
+SELECT did_numbers.id as did_id,
+       customer.descr as customer,
+       customer_bg.descr as billing_group,
+       did_numbers.prefix as prefix,
+       did_numbers.pai as pai
+FROM did_numbers
+LEFT JOIN customer_bg ON did_numbers.customer_bg_id=customer_bg.id
+LEFT JOIN customer ON customer_bg.customer_id=customer.id
+$sqlwhere;
+  });
+  if ($sqlwhere) {
+    $sth->execute($sqlparam);
+  }
+  else {
+    $sth->execute();
+  }
+  my $tb = Text::Table->new(
+    \'| ', {title => 'DID ID'},
+    \' | ', {title => 'Customer'},
+    \' | ', {title => 'Billing Group'},
+    \' | ', {title => 'DID Prefix'},
+    \' | ', {title => 'P-Asserted-Identity'},
+    \' |'
+  );
+  while (my $row = $sth->fetchrow_hashref) {
+    $tb->load([$row->{did_id}, $row->{customer}, $row->{billing_group},
+               $row->{prefix}, $row->{pai}, ]);
+  }
+  print $tb->body_rule('-', '+');
+  print $tb->title();
+  print $tb->rule('-', '+');
+  for ($tb->body()) {
+    print $_;
+    print $tb->body_rule('-', '+');
+  }
+}
+
+sub number_rm {
+  my $opts = shift;
+  unless (exists $opts->{'bg'} && $opts->{'bg'} =~ /^\d+$/) {
+    die("Invalid bg paramater\n" . $main::errmsg);
+  }
+  unless (exists $opts->{'range'}) {
+    die("Invalid prefix paramater\n" . $main::errmsg);
+  }
+
+  my $sth = $dbh->prepare(qq{
+DELETE FROM did_numbers
+WHERE customer_bg_id = ?
+AND prefix = ?;
+  });
+  foreach my $prefix (parse_number_re($opts->{'range'})) {
+    my $rc = $sth->execute($opts->{'bg'}, $prefix);
+    if ($rc) {
+      say "Deleted $prefix";
+    }
+    else {
+      say "Unable to delete $prefix";
+    }
+  }
+}
+
+sub parse_number_re {
+  my $rangestr = shift;
+  my (@numbers, $first, $count, $last);
+  unless ($rangestr =~
+                  /^(\d{10}(-\d{10}|\+\d{1,3})?)(,\d{10}(-\d{10}|\+\d{1,3})?)*$/
+          ) {
+    die("Invalid range paramater\n" . $main::errmsg);
+  }
+  foreach my $range (split ',', $rangestr) {
+    if ($range =~ /^\d{10}$/) {
+      push @numbers, $range;
+      next;
+    }
+    if ($range =~ /^\d{10}-\d{10}$/) {
+      my ($first, $last) = split '-', $range;
+      push @numbers, $first .. $last;
+      undef $first;
+      undef $last;
+      next;
+    }
+    if ($range =~ /\d{10}\+\d{1,3}$/) {
+      ($first, $count) = split /\+/, $range;
+      for ( my $i = 0; $i < $count; $i++) {
+        push @numbers, $first;
+        $first++;
+      }
+      undef $first;
+      undef $count;
+    }
+  }
+  my %seen = ();
+  my @unique = grep { ! $seen{ $_ }++ } @numbers;
+  return @unique;
+}
