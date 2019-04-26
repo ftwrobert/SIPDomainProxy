@@ -136,7 +136,10 @@ my ($db_driver, $db_host, $db_user, $db_pass, $db_name);
 our ($privsubnet, $privmask);
 my $configfile = getcwd . '/../kamailio/conf/config.cfg';
 if (! -s $configfile ) {
-  die('Unable to open config file. Have you ran the installation script?');
+  $configfile = '/etc/kamailio/config.cfg';
+  if (! -s $configfile ) {
+    die('Unable to open config file. Have you ran the installation script?');
+  }
 }
 
 open (my $fh, '<:encoding(UTF-8)', $configfile)
@@ -428,10 +431,8 @@ sub auth_list {
     $sqlauthwhere = 'WHERE customer_auth.id IS NOT NULL';
   }
   my $sth = $dbh->prepare(qq{
-SELECT customer.id as customer_id,
-       customer.descr as customer,
-       customer_bg.id as customer_bg_id,
-       customer_bg.descr as billing_group,
+SELECT CONCAT('[', customer.id, '] ', customer.descr) as customer,
+       CONCAT('[', customer_bg.id, '] ', customer_bg.descr) as billing_group,
        customer_auth.id as auth_id,
        customer_auth.pai as pai,
        customer_auth.priority as priority,
@@ -626,8 +627,7 @@ sub billing_group_list {
     $sqlwhere = 'WHERE customer.id = ?';
   }
   my $sth = $dbh->prepare(qq{
-select customer.id as customer_id,
-       customer.descr as customer,
+select CONCAT('[', customer.id, '] ', customer.descr) as customer,
        customer_bg.id as customer_bg_id,
        customer_bg.descr as billing_group,
        customer_bg.pai as pai
@@ -643,16 +643,15 @@ $sqlwhere;
     $sth->execute();
   }
   my $tb = Text::Table->new(
-    \'| ',  {title => 'Customer ID'},
+    \'| ',  {title => 'Billing Group ID'},
     \' | ', {title => 'Customer'},
-    \' | ', {title => 'Billing Group ID'},
     \' | ', {title => 'Billing Group'},
     \' | ', {title => 'P-Asserted-Identity'},
     \' |'
   );
   while (my $row = $sth->fetchrow_hashref) {
-    $tb->load([$row->{customer_id},   $row->{customer}, $row->{customer_bg_id},
-               $row->{billing_group}, $row->{pai}]);
+    $tb->load([$row->{customer_bg_id}, $row->{customer},
+               $row->{billing_group},  $row->{pai}]);
   }
   print $tb->body_rule('-', '+');
   print $tb->title();
@@ -872,8 +871,8 @@ sub number_list {
   }
   my $sth = $dbh->prepare(qq{
 SELECT did_numbers.id as did_id,
-       customer.descr as customer,
-       customer_bg.descr as billing_group,
+       CONCAT('[', customer.id, '] ', customer.descr) as customer,
+       CONCAT('[', customer_bg.id, '] ', customer_bg.descr) as billing_group,
        did_numbers.prefix as prefix,
        did_numbers.pai as pai
 FROM did_numbers
