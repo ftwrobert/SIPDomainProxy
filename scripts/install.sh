@@ -44,7 +44,7 @@ SRCDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )
 SRCKAMDIR="$SRCDIR/kamailio/conf"
 
 # create a symlink for proxyctl
-ln -s "$SRCDIR/scripts/proxyctl /usr/local/sbin/proxyctl"
+ln -s "$SRCDIR/scripts/proxyctl" "/usr/local/sbin/proxyctl"
 
 # Create user accounts
 if ! grep -qE "^/usr/sbin/nologin" /etc/shells
