@@ -25,7 +25,7 @@ Usage:
   --domain add SUBOPTIONS
     SUBOPTIONS
       addr=PBX_IP_ADDR
-      authtype=(passthrough|local)
+      authtype=(passthrough|registration)
       fqdn=FQDN
       sipport=PBX_SIP_PORT
 
@@ -698,7 +698,7 @@ sub domain_add {
 
   unless (exists $opts->{'authtype'} # required arg, validation included
           && (    $opts->{'authtype'} eq 'passthrough'
-               || $opts->{'authtype'} eq 'local')) {
+               || $opts->{'authtype'} eq 'registration')) {
     die("Invalid authtype paramater\n" . $main::errmsg);
   }
 
@@ -716,10 +716,10 @@ sub domain_add {
   # if we're still here, we have all of our arguments.
 
   my $dsth = $dbh->prepare(qq{
-INSERT INTO domain (domain, last_modified)
-VALUES (?, now());
+INSERT INTO domain (domain, did, last_modified)
+VALUES (?, ?, now());
   });
-  my $dstatus = $dsth->execute($opts->{'fqdn'});
+  my $dstatus = $dsth->execute($opts->{'fqdn'}, $opts->{'fqdn'});
   if (! $dstatus) {
     die('An unexpected error has occured, Unable to add domain');
   }
