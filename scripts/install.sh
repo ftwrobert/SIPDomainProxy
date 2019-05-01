@@ -24,7 +24,7 @@ KAMAILIO_USER=kamailio
 PUBADDR=$(dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | awk -F'"' '{ print $2}')
 # Another option $(dig -4 +short myip.opendns.com @resolver1.opendns.com)
 DEFGW=$(ip route list match 0 | cut -f 3 -d ' ')
-ROUTE=$(ip route list match $DEFGW | grep -v $DEFGW)
+ROUTE=$(ip route list match $DEFGW | grep -v " $DEFGW ")
 PRIVADDR=$(echo "$ROUTE" | grep -oE "src .*" | cut -f 2 -d ' ')
 PRIVSUBNET=$(echo "$ROUTE" | cut -f 1 -d '/')
 PRIVMASK=$(echo "$ROUTE" | cut -f 2 -d '/' | cut -f 1 -d ' ')
