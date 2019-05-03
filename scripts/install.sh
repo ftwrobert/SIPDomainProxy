@@ -169,8 +169,6 @@ psql -h $DB_HOST -U $DB_USER $DB_NAME \
 psql -h $DB_HOST -U $DB_USER $DB_NAME \
 -f /usr/src/kamailio/utils/kamctl/postgres/registrar-create.sql
 
-#!FIXME! Add custom tables for Account, Billing Group, Auth method and DID tracking
-
 cat > "/tmp/SIPDomainProxy.schema" <<EOF
 
 -- Customer account information
