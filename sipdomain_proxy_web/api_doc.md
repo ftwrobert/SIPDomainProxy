@@ -48,102 +48,102 @@ Resources
 Resources work on the CRUD principle, for a visual representation of how these resources are tied together, please reference the state diagram.
 
 `GET auth/:id`  
-**Item**  
+__Item__  
 Returns a representation of a single authentication identified by the id parameter.
 
 `PUT auth/:id`  
-**Item**  
+__Item__  
 Updates a single authentication identified by the id parameter.
 
 `DELETE auth/:id`  
 Permanently deletes a single authentication identified by the id parameter.
 
 `GET billing_group/:id`  
-**Item**  
+__Item__  
 Returns a representation of a single billing group identified by the id parameter.
 
 `PUT billing_group/:id`  
-**Item**  
+__Item__  
 Updates a single billing group identified by the id parameter.
 
 `DELETE billing_group/:id`  
 Deletes a single billing group identified by the id parameter.
 
 `GET billing_group/:id/auths`  
-**Collection**  
+__Collection__  
 Returns a list of authentications for a single billing group identified by the id parameter.
 
 `POST billing_group/:id/auths`  
-**Collection**  
+__Collection__  
 Accepts a template to provision a new authentication for a single billing group identified by the id parameter.
 
 `GET billing_group/:id/numbers`  
-**Collection**  
+__Collection__  
 Returns a list of provisioned numbers for a single billing group identified by the id parameter.
 
 `POST billing_group/:id/numbers`  
-**Collection**  
+__Collection__  
 Accepts a template to provision a new number for a single billing group identified by the id parameter.
 
 `GET customer/:id`  
-**Item**  
+__Item__  
 Returns a representation of a single customer identified by the id parameter.
 
 `PUT customer/:id`  
-**Item**  
+__Item__  
 Updates a single customer identified by the id parameter.
 
 `DELETE customer/:id`  
 Deletes a single customer identified by the id parameter.
 
 `GET customer/:id/billing_groups`  
-**Collection**  
+__Collection__  
 Returns a list of billing groups for a single customer identified by the id parameter.
 
 `POST customer/:id/billing_groups`  
-**Collection**  
+__Collection__  
 Accepts a template to provision a new billing group for a single customer identified by the id parameter.
 
 `GET customers/`  
-**Collection**  
+__Collection__  
 Returns a list of provisioned customers.
 
 `POST customers/`  
-**Collection**  
+__Collection__  
 Accepts a template to provision a new customer.
 
 `GET domain/:id`  
-**Item**  
+__Item__  
 Returns a representation of a single domain identified by the id parameter.
 
 `PUT domain/:id`  
-**Item**  
+__Item__  
 Updates a single domain identified by the id parameter.
 
 `DELETE domain/:id`  
 Deletes a single domain identified by the id parameter.
 
 `GET domains/`  
-**Collection**  
+__Collection__  
 Returns a list of provisioned domains.
 
 `POST domains/`  
-**Collection**  
+__Collection__  
 Accepts a template to provision a new domain.
 
 `GET number/:id`  
-**Item**  
+__Item__  
 Returns a representation of a single number prefix identified by the id parameter.
 
 `PUT number/:id`  
-**Item**  
+__Item__  
 Updates a single number identified by the id parameter.
 
 `DELETE number/:id`  
 Deletes a single number prefix identified by the id parameter.
 
 `GET search/:search_criteria`  
-**Collection**  
+__Collection__  
 Returns a list of customers, billing groups, and numbers found by the search_criteria.
 
 `GET template/:type`  
