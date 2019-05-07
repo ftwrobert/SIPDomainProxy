@@ -47,105 +47,105 @@ Resources
 =======
 Resources work on the CRUD principle, for a visual representation of how these resources are tied together, please reference the state diagram.
 
-`GET auth/:id`
-**Item**
+`GET auth/:id`  
+**Item**  
 Returns a representation of a single authentication identified by the id parameter.
 
-`PUT auth/:id`
-**Item**
+`PUT auth/:id`  
+**Item**  
 Updates a single authentication identified by the id parameter.
 
-`DELETE auth/:id`
+`DELETE auth/:id`  
 Permanently deletes a single authentication identified by the id parameter.
 
-`GET billing_group/:id`
-**Item**
+`GET billing_group/:id`  
+**Item**  
 Returns a representation of a single billing group identified by the id parameter.
 
-`PUT billing_group/:id`
-**Item**
+`PUT billing_group/:id`  
+**Item**  
 Updates a single billing group identified by the id parameter.
 
-`DELETE billing_group/:id`
+`DELETE billing_group/:id`  
 Deletes a single billing group identified by the id parameter.
 
-`GET billing_group/:id/auths`
-**Collection**
+`GET billing_group/:id/auths`  
+**Collection**  
 Returns a list of authentications for a single billing group identified by the id parameter.
 
-`POST billing_group/:id/auths`
-**Collection**
+`POST billing_group/:id/auths`  
+**Collection**  
 Accepts a template to provision a new authentication for a single billing group identified by the id parameter.
 
-`GET billing_group/:id/numbers`
-**Collection**
+`GET billing_group/:id/numbers`  
+**Collection**  
 Returns a list of provisioned numbers for a single billing group identified by the id parameter.
 
-`POST billing_group/:id/numbers`
-**Collection**
+`POST billing_group/:id/numbers`  
+**Collection**  
 Accepts a template to provision a new number for a single billing group identified by the id parameter.
 
-`GET customer/:id`
-**Item**
+`GET customer/:id`  
+**Item**  
 Returns a representation of a single customer identified by the id parameter.
 
-`PUT customer/:id`
-**Item**
+`PUT customer/:id`  
+**Item**  
 Updates a single customer identified by the id parameter.
 
-`DELETE customer/:id`
+`DELETE customer/:id`  
 Deletes a single customer identified by the id parameter.
 
-`GET customer/:id/billing_groups`
-**Collection**
+`GET customer/:id/billing_groups`  
+**Collection**  
 Returns a list of billing groups for a single customer identified by the id parameter.
 
-`POST customer/:id/billing_groups`
-**Collection**
+`POST customer/:id/billing_groups`  
+**Collection**  
 Accepts a template to provision a new billing group for a single customer identified by the id parameter.
 
-`GET customers/`
-**Collection**
+`GET customers/`  
+**Collection**  
 Returns a list of provisioned customers.
 
-`POST customers/`
-**Collection**
+`POST customers/`  
+**Collection**  
 Accepts a template to provision a new customer.
 
-`GET domain/:id`
-**Item**
+`GET domain/:id`  
+**Item**  
 Returns a representation of a single domain identified by the id parameter.
 
-`PUT domain/:id`
-**Item**
+`PUT domain/:id`  
+**Item**  
 Updates a single domain identified by the id parameter.
 
-`DELETE domain/:id`
+`DELETE domain/:id`  
 Deletes a single domain identified by the id parameter.
 
-`GET domains/`
-**Collection**
+`GET domains/`  
+**Collection**  
 Returns a list of provisioned domains.
 
-`POST domains/`
-**Collection**
+`POST domains/`  
+**Collection**  
 Accepts a template to provision a new domain.
 
-`GET number/:id`
-**Item**
+`GET number/:id`  
+**Item**  
 Returns a representation of a single number prefix identified by the id parameter.
 
-`PUT number/:id`
-**Item**
+`PUT number/:id`  
+**Item**  
 Updates a single number identified by the id parameter.
 
-`DELETE number/:id`
+`DELETE number/:id`  
 Deletes a single number prefix identified by the id parameter.
 
-`GET search/:search_criteria`
-**Collection**
+`GET search/:search_criteria`  
+**Collection**  
 Returns a list of customers, billing groups, and numbers found by the search_criteria.
 
-`GET template/:type`
+`GET template/:type`  
 Returns a representation of a template used to create items.  
 Valid types are: `auth`, `billing_group`, `customer`, `domain`, and `number`.
