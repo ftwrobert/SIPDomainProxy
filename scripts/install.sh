@@ -60,7 +60,7 @@ apt-get -y install build-essential bison flex git wget
 apt-get -y install perl-doc libmodern-perl-perl \
                    libgetopt-long-descriptive-perl libclass-dbi-perl \
                    libclass-dbi-pg-perl libtext-table-perl libnetaddr-ip-perl \
-                   libdata-validate-domain-perl
+                   libdata-validate-domain-perl libmojolicious-perl
 # RTPEngine Prerequisites
 apt-get -y install dpkg-dev debhelper default-libmysqlclient-dev \
                    libmysqlclient-dev gperf iptables-dev libavcodec-dev \
