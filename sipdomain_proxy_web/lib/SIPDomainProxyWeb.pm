@@ -11,6 +11,10 @@ sub startup {
   # Configure the application
   $self->secrets($config->{secrets});
 
+  # For future use, we will replace the proxyctl command with the CLI version
+  # of this application.
+  #push @{$self->commands->namespaces}, 'SBCManager::Command';
+
   # Router
   my $r = $self->routes;
 

@@ -1,3 +1,13 @@
+API Documentation
+========
+
+Media Type
+=======
+This application will use the following media types from https://www.iana.org/assignments/media-types/media-types.xhtml
+
+[application/vnd.collection+json](Collection+JSON.html)  
+[application/vnd.collection.next+json](Collection.next+JSON.html)  
+
 Magic Strings
 =======
 

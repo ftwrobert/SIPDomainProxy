@@ -1,0 +1,947 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0061)http://amundsen.com/media-types/collection/format/#data-types -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Collection+JSON - Document Format : 
+          Media Types
+        </title>
+    <link type="text/css" rel="stylesheet" href="./Collection+JSON - Document Format_files/media-types.css">
+  <link rel="stylesheet" type="text/css" href="chrome-extension://pkehgijcmpdhfbdbbnkijodmdjhbjlgp/skin/socialwidgets.css"></head>
+  <body>
+    <div id="ads" style="text-align:center;"><script type="text/javascript">
+            
+            google_ad_client = "pub-2944238157647009";
+            google_ad_width = 728;
+            google_ad_height = 90;
+            google_ad_format = "728x90_as";
+            google_ad_type = "text_image";
+            google_ad_channel = "4794860677";
+            google_color_border = "000000";
+            google_color_bg = "F0F0F0";
+            google_color_link = "000000";
+            google_color_text = "000000";
+            google_color_url = "000000";
+            
+        </script><script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script></div>
+    <h1>Media Types</h1>
+    <div id="page">
+      <div id="content">
+        <ul class="trail">
+          <li><a href="http://amundsen.com/media-types/" title="Media Types">Home</a></li>
+          <li>» <a href="http://amundsen.com/media-types/collection/" title="Collection+JSON">Collection+JSON</a></li>
+          <li>» <a href="http://amundsen.com/media-types/collection/format/" title="Format">Format</a></li>
+        </ul>
+        <h2>Collection+JSON - Document Format</h2>
+        <h3>Description</h3><description><p><a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> 
+        is a JSON-based read/write hypermedia-type designed to support management and querying of simple collections.
+      </p></description>
+          <dl>
+            <dt>Author:</dt>
+            <dd>Mike Amundsen (<a href="mailto:mamund@yahoo.com">mamund@yahoo.com</a>)</dd>
+            <dt>Dates:</dt>
+            <dd>
+          2011-05-04 (Created)<br>
+          2013-02-24 (Updated)
+        </dd>
+            <dt>Status:</dt>
+            <dd><span class="reg-approved">Approved</span></dd>
+          </dl>
+          <h3>Contents</h3>
+          <ol>
+            <li><a href="http://amundsen.com/media-types/collection/format/#profiles">Profiles</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#general">General Concepts</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#objects">Objects</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#arrays">Arrays</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#properties">Properties</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#link-relations">Link Relations</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#data-types">Data Types</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#extensibility">Extensibility</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#acknowledgements">Acknowledgements</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#references">References</a></li>
+            <li><a href="http://amundsen.com/media-types/collection/format/#history">Update History</a></li>
+          </ol>
+          <blockquote><b>NOTE:</b><br>
+      The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+      NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+      "OPTIONAL" in this document are to be interpreted as described in
+      <a href="http://tools.ietf.org/html/rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">RFC2119</a>.
+      </blockquote>
+        
+        <h4 style="display:inline">1. </h4><a id="profiles"></a><h3 style="display:inline;clear:right">Profiles</h3>
+        <div class="sbody"><sbody><h4 style="color:red">This section is proposed draft (2013-02-24 --mamund).</h4>
+            <p>
+					The <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> media-type supports the use of
+					semantic <a href="http://tools.ietf.org/html/draft-wilde-profile-link-04" class="ext-link">profiles</a> in order to provide 
+					additional information about the application-level semantics for the message body. 
+					This version of the specifiction supports three possible ways to communicate profile information in a
+					<a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> conversation:
+				</p>
+            <ol>
+              <li>The <code>profile</code> parameter in the media type identifier</li>
+              <li>A <code>LINK</code> header with <code>rel="profile"</code></li>
+              <li>Within the <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> body as a 
+					<a href="http://amundsen.com/media-types/collection/format/#arrays-links">link</a> element (in the links collection) with a <a href="http://amundsen.com/media-types/collection/format/#properties-rel">rel</a>poperty 
+					value of "profile".</li>
+            </ol>
+            <p>
+					The profile value is a list of one or more IRIs identifying specific
+					constraints or conventions that apply to a <a href="http://ammundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+					document. The profile MUST NOT change the semantics of the resource representation when processed without
+					the profile. The profile value MAY also be used by clients to express their preferences. Profile IRIs SHOULD
+					be dereferenceable and SHOULD provide additional related semantic information.
+				</p>
+            <p>
+					The profile value is OPTIONAL. It MAY be used in a request/response conversation. Servers MAY ignore this value when sent by
+					the client. Clients MAY ignore this value when sent by the server.
+				</p>
+            <blockquote><b>NOTE:</b><br>
+					The semantics of the <code>profile</code> parameter, link header, and link relation are covered in the 
+					<a href="http://tools.ietf.org/html/draft-wilde-profile-link-04" class="ext-link" style="background-color:#e0e0e0">Profile Link Relation Type</a> specification.
+				</blockquote></sbody></div>
+        <h4 style="display:inline">1.1. </h4><a id="profile-parameter"></a><h4 style="display:inline;clear:right">Profile Media-Type Parameter</h4>
+        <div class="sbody"><sbody><p>Profile information can be supplied via the media type <code>profile</code> parameter. Examples of valid profile media-type parameters are:</p>
+            <ul>
+              <li><code>application/vnd.collection+json;profile=http://example.org/profiles/vcard</code></li>
+              <li><code>application/vnd.collection+json;profile=http://example.org/profiles/vcard http://schema.org/Person</code></li>
+            </ul>
+            <blockquote><b>NOTE</b><br>
+							The profile media type parameter value MAY be sent with both HTTP Requests (by clients) and HTTP Responses (by servers).
+						</blockquote></sbody></div>
+        <h4 style="display:inline">1.2. </h4><a id="profile-header"></a><h4 style="display:inline;clear:right">Profile Link Header</h4>
+        <div class="sbody"><sbody><p>
+							The Link Header[<a href="http://tools.ietf.org/html/rfc5988" title="RFC5988 - Web Linking" class="ext-link">RFC5988</a>] can also be 
+							used to communicate profile details. Examples of valid profile Link headers are:</p>
+            <ul>
+              <li><code>Link: &lt;http://example.org/profiles/vcard&gt;; rel="profile"</code></li>
+              <li><code>
+									Link: &lt;http://example.org/profiles/vcard&gt;; rel="profile",
+									&lt;http://schema.org/Person&gt;; rel="profile"
+								</code></li>
+            </ul>
+            <blockquote><b>NOTE</b><br>
+							Link header profile value MAY be sent with both HTTP Requests (by clients) and HTTP Responses (by servers).
+						</blockquote></sbody></div>
+        <h4 style="display:inline">1.3. </h4><a id="profile-link"></a><h4 style="display:inline;clear:right">Profile Link Element</h4>
+        <div class="sbody"><sbody><p>
+							Profile information can be supplied as part of the top-level <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> collection
+							in a <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> document.
+							Examples of valid profile Link elements within a 
+							<a href="http://amundsen.com/media-types/collection" class="ext-link">
+								Collection+JSON
+							</a>
+							document are:
+						</p>
+            <ul>
+              <li><code>"links: [{"link" : {"href" : "http://example.org/profiles/vcard", "rel" : "profile"}]</code></li>
+              <li><code>
+									"links: [<br>{"link" : {"href" : "http://example.org/profiles/vcard", "rel" : "profile"},<br>
+									{"link" : {"href" : "http://schema.org/Person", "rel" : "profile"}<br>] 
+								</code></li>
+            </ul>
+            <blockquote><b>NOTE</b><br>
+							The profile link element MAY be sent with HTTP Responses (by servers), but not with HTTP Requests.
+						</blockquote></sbody></div>
+        <h4 style="display:inline">2. </h4><a id="general"></a><h3 style="display:inline;clear:right">General Concepts</h3>
+        <div class="sbody"><sbody><p>
+            This section contains general concepts that apply to all <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+            documents.
+          </p>
+            <p>
+            The <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> hypermedia type is designed to 
+            support full read/write capability for simple lists (contacts, tasks, blog entries, etc.). The standard application
+            semantics supported by this media type include Create, Read, Update, and Delete (CRUD) along w/ support for predefined
+            queries including <a href="http://amundsen.com/media-types/collection/format/#query-templates" class="ext-link">query templates</a> (similar to HTML "GET" forms). 
+            Write operations are defined using a <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a>
+            object supplied by the server as part of the response representation.
+          </p>
+            <p>
+            Each <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> in a <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a><a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>
+            has an assigned URI (via the <a href="http://amundsen.com/media-types/collection/format/#properties-href">href</a> property) and an optional array of one or more 
+            <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> elements along with an optional array of one or more 
+            <a href="http://amundsen.com/media-types/collection/format/#arrays-links">link</a> elements. Both arrays support a 
+            <a href="http://amundsen.com/media-types/collection/format/#properties-name">name</a> property for each object in the collection in order to decorate these 
+            elements with domain-specific semantic information (e.g. <code>"data" : [{"name" : "first-name", ...},...]</code>).
+          </p>
+            <p>
+            The <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> hypermedia type has
+            a limited set of predefined <a href="http://amundsen.com/media-types/collection/format/#link-relations" class="ext-link">link relation</a> values and supports 
+            <a href="http://amundsen.com/media-types/collection/format/#rels-other" class="ext-link">additional values</a> 
+            applied by implementors in order to better describe the application domain to which the media type is applied.
+          </p>
+            <p>
+            The following sections describe the process of reading and writing data using the 
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> hypermedia type
+            as well as the way to parse and execute <a href="http://amundsen.com/media-types/collection/format/#query-templates" class="ext-link">Query Templates</a>. Additional examples
+            can be found in the <a href="http://amundsen.com/media-types/collection/examples/" class="ext-link">Examples</a>
+            section of this documentation.
+          </p></sbody></div>
+        <h4 style="display:inline">2.1. </h4><a id="read-write"></a><h4 style="display:inline;clear:right">Reading and Writing Data</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+                media type supports a limited form of read/write semantics; the Create-Read-Update-Delete
+                (or <a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete" class="ext-link">CRUD</a>) pattern.
+                In addition to CRUD operations, the <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+                media type supports <a href="http://amundsen.com/media-types/collection/format/#query-templates" class="ext-link">Query Templates</a>.
+              </p>
+            <p>
+                This section describes the details of how clients can recognize and implement reads and writes found 
+                within <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> 
+                responses.
+              </p><!-- comments 
+              <ul class="comments">
+                <li>NOTE: This sections borrows very heavily from the AtomPub RFC5023. It should be re-written (mca)</li>
+                <li>Should consider support for Base64-encoded uploads (images, etc.) (Ngarthl, mca)</li>
+              </ul>
+              --></sbody></div>
+        <h4 style="display:inline">2.1.1. </h4><a id="reading-collections"></a><h4 style="display:inline;clear:right">Reading Collections</h4>
+        <div class="sbody"><sbody><p>
+                    To get a list of the <a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> in a 
+                    <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>, the client sends an 
+                    HTTP GET request to the <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a> of a 
+                    <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>.  
+                    a <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+                    Document is returned which contains one or more <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> objects in an array.
+                    The response may describe all, or only a partial list, of the 
+                    <a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> in a <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>.
+                  </p>
+            <pre>*** REQUEST ***
+GET /my-collection/ HTTP/1.1
+Host: www.example.org
+Accept: application/vnd.collection+json
+
+*** RESPONSE ***
+200 OK HTTP/1.1
+Content-Type: application/vnd.collection+json
+Content-Length: xxx
+
+{ "collection" : {...}, ... }</pre></sbody></div>
+        <h4 style="display:inline">2.1.2. </h4><a id="adding-items"></a><h4 style="display:inline;clear:right">Adding an Item</h4>
+        <div class="sbody"><sbody><p>
+                    To create a new <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> in the 
+                    <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>, the client first uses the
+                    <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a> object to compose a valid 
+                    <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> representation and then uses HTTP POST
+                    to send that representation to the server for processing. 
+                  </p>
+            <p>
+                    If the <a href="http://amundsen.com/media-types/collection/format/#arrays-item">item</a> resource was created successfully, 
+                    the server responds with a status code of 201 and a Location header that
+                    contains the <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a> of the newly created 
+                    <a href="http://amundsen.com/media-types/collection/format/#arrays-item">item</a> resource.
+                  </p>
+            <pre>*** REQUEST ***
+POST /my-collection/ HTTP/1.1
+Host: www.example.org
+Content-Type: application/vnd.collection+json
+
+{ "template" : { "data" : [ ...] } }
+ 
+*** RESPONSE ***
+201 Created HTTP/1.1
+Location: http://www.example.org/my-collection/1</pre>
+            <p>
+                    Once an <a href="http://amundsen.com/media-types/collection/format/#arrays-item">item</a> resource has been created 
+                    and its <a href="http://amundsen.com/media-types/collection/format/#types-uri">URI</a> is known, that
+                    <a href="http://amundsen.com/media-types/collection/format/#types-uri">URI</a> can be used to read, update, and delete the 
+                    resource.
+                  </p></sbody></div>
+        <h4 style="display:inline">2.1.3. </h4><a id="reading-items"></a><h4 style="display:inline;clear:right">Reading an Item</h4>
+        <div class="sbody"><sbody><p>
+                    Clients can retrieve an existing <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> resource
+                    by sending an HTTP GET request to the <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a> of an
+                    <a href="http://amundsen.com/media-types/collection/format/#arrays-item">item</a> resource. If the request is valid, the
+                    server will respond with a representation of that <a href="http://amundsen.com/media-types/collection/format/#arrays-item">item</a> resource.
+                  </p>
+            <pre>*** REQUEST ***
+GET /my-collection/1 HTTP/1.1
+Host: www.example.org
+Accept: application/vnd.collection+json
+
+*** RESPONSE ***
+200 OK HTTP/1.1
+Content-Type: application/vnd.collection+json
+Content-Length: xxx
+
+{ "collection" : { "href" : "...", "items" : [ { "href" : "...", "data" : [...] } } }</pre>
+            <p>
+                    Note that the valid response is actually a complete <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>
+                    document that contains only one <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> (and possibly related 
+                    <a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> and <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a> properties).
+                  </p></sbody></div>
+        <h4 style="display:inline">2.1.4. </h4><a id="updating-items"></a><h4 style="display:inline;clear:right">Updating an Item</h4>
+        <div class="sbody"><sbody><p>
+                    To update an existing resource, the client uses the <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a>
+                    object as a guide to composing a replacement <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> representation
+                    and then uses HTTP PUT to send that representation to the server.
+                  </p>
+            <p>
+                    If the update is successful, the server will respond with HTTP status code 200 and possibly
+                    a representation of the updated <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> resource representation.
+                  </p>
+            <pre>*** REQUEST ***
+PUT /my-collection/1 HTTP/1.1
+Host: www.example.org
+Content-Type: application/vnd.collection+json
+
+{ "template" : { "data" : [ ...] } }
+ 
+*** RESPONSE ***
+200 OK HTTP/1.1   </pre></sbody></div>
+        <h4 style="display:inline">2.1.5. </h4><a id="deleting-items"></a><h4 style="display:inline;clear:right">Deleting an Item</h4>
+        <div class="sbody"><sbody><p>
+                    Clients can delete existing resources by sending an HTTP DELETE request to the
+                    <a href="http://amundsen.com/media-types/collection/format/#types-uri">URI</a> of the <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> resource.
+                  </p>
+            <p>
+                    If the delete request is successful, the server SHOULD respond with an HTTP status code
+                    of 204.
+                  </p>
+            <pre>*** REQUEST ***
+DELETE /my-collection/1 HTTP/1.1
+Host: www.example.org
+ 
+*** RESPONSE ***
+204 No Content HTTP/1.1   </pre></sbody></div>
+        <h4 style="display:inline">2.2. </h4><a id="query-templates"></a><h4 style="display:inline;clear:right">Query Templates</h4>
+        <div class="sbody"><sbody><p>
+                Clients that support the <a href="http://amundsen.com/media-types/collection/" class="ext-link">
+                Collection+JSON</a> media type SHOULD be able to recognize and parse query templates found within
+                responses. Query templates consist of a <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array associated with
+                an <a href="http://amundsen.com/media-types/collection/format/#properties-href">href</a> property. The <a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> array
+               supports query templates.
+              </p>
+            <p>
+                For query templates, the name/value pairs of the <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array set are
+                appended to the <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a> found in the <a href="http://amundsen.com/media-types/collection/format/#propeties-href">href</a>
+                property associated with the <a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a>
+                array (with a question-mark ["?"] as separator) and this new
+                <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a> is sent to the processing agent.
+              </p>
+            <pre>// query template sample
+{
+  "queries" :
+  [
+    {
+      "href" : "http://example.org/search",
+      "rel" : "search",
+      "prompt" : "Enter search string",
+      "data" :
+      [
+        {"name" : "search", "value" : ""}
+      ]
+    }
+  ]
+}</pre>
+            <p>
+                In the above example, if the user supplied "JSON" for the <a href="http://amundsen.com/media-types/collection/format/#properties-value">value</a>
+                property, the user agent would construct the following <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a>:
+              </p>
+            <p><code>http://example.org/search?search=JSON</code></p></sbody></div>
+        <h4 style="display:inline">3. </h4><a id="objects"></a><h3 style="display:inline;clear:right">Objects</h3>
+        <div class="sbody"><sbody><p>
+            An object is an unordered collection of zero or more name/value
+   pairs, where a name is a string and a value is a string, number,
+   boolean, null, object, or array.
+          </p>
+            <ul class="clist">
+            The following elements are always represented as objects in 
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+            documents. They are:
+            <li><a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a></li>
+              <li><a href="http://amundsen.com/media-types/collection/format/#objects-error">error</a></li>
+              <li> and <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a>.</li>
+            </ul>
+            <p></p></sbody></div>
+        <h4 style="display:inline">3.1. </h4><a id="objects-collection"></a><h4 style="display:inline;clear:right">collection</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> object contains
+                all the "records" in the representation. This is a REQUIRED object and there
+                MUST NOT be more than one <a href="http://amundsen.com/media-types/collection/format/#object-collection">collection</a> object
+                in a <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+                document. It is a top-level document property.
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#object-collection">collection</a> object SHOULD have a
+                <a href="http://amundsen.com/media-types/collection/format/#properties-version">version</a> property. For this release, the value of the
+                <a href="http://amundsen.com/media-types/collection/format/#properties-version">version</a> property MUST be set to <code>1.0</code>. If
+                there is no <a href="http://amundsen.com/media-types/collection/format/#properties-version">version</a> property present, it should be
+                assumed to be set to <code>1.0</code>.
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#object-collection">collection</a> object SHOULD have an
+                <a href="http://amundsen.com/media-types/collection/format/#properties-href">href</a> property. The
+                <a href="http://amundsen.com/media-types/collection/format/#properties-href">href</a> property MUST contain a valid
+                <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a>.
+                This <a href="http://amundsen.com/media-types/collection/format/type-uri">URI</a> SHOULD represent
+                the address used to retrieve a representation of the document. This
+                <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a> MAY be used to add a new record 
+                (See <a href="http://amundsen.com/media-types/collection/format/#read-write" class="ext-link">Reading and Writing Data</a>).
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> object MAY have an
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array child property. 
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> object MAY have an
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> array child property. 
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> object MAY have an
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> array child property. 
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> object MAY have an
+                <a href="http://amundsen.com/media-types/collection/format/#ojects-template">template</a> object child property. 
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> object MAY have an
+                <a href="http://amundsen.com/media-types/collection/format/#ojects-error">error</a> object child property. 
+              </p><!-- comments
+              <ul class="comments">
+                <li>Add OPTIONAL <code>links : []</code> property to the collection object (pc1oad1etter)</li>
+                <li>Support "nested" collections (Qfwfq)</li>
+              </ul>
+              --><pre>// sample collection object
+{
+  "collection" :
+  {
+    "version" : "1.0",
+    "href" : URI,
+    "links" : [ARRAY],
+    "items" : [ARRAY],
+    "queries" : [ARRAY],
+    "template" : {OBJECT},
+    "error" : {OBJECT}
+  }
+}</pre></sbody></div>
+        <h4 style="display:inline">3.2. </h4><a id="objects-error"></a><h4 style="display:inline;clear:right">error</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-error">error</a> object contains addiitional information on the
+                latest error condition reported by the server. This is an
+                OPTIONAL object and there MUST NOT be more than one
+                <a href="http://amundsen.com/media-types/collection/format/#objects-error">error</a> object in a
+                <a href="http://amundsen.com/media-types/collection/" class="ext-link">
+                  Collection+JSON</a> document. It is a top-level document property.
+              </p>
+            <ul class="clist">
+            The following elements MAY appear as child properties of the
+            <a href="http://amundsen.com/media-types/collection/format/#objects-error">error</a> object:
+            <li><a href="http://amundsen.com/media-types/collection/format/#properties-code">code</a></li>
+              <li><a href="http://amundsen.com/media-types/collection/format/#properties-message">message</a></li>
+              <li> and <a href="http://amundsen.com/media-types/collection/format/#properties-title">title</a></li>.
+          </ul>
+            <p></p>
+            <pre>// sample error object
+{
+  "error" :
+  {
+    "title" : STRING,
+    "code" : STRING,
+    "message" : STRING  
+  }
+}</pre></sbody></div>
+        <h4 style="display:inline">3.3. </h4><a id="objects-template"></a><h4 style="display:inline;clear:right">template</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a> object contains all the
+                input elements used to add or edit collection "records." This is an
+                OPTIONAL object and there MUST NOT be more than one
+                <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a> object in a
+                <a href="http://amundsen.com/media-types/collection/" class="ext-link">
+                  Collection+JSON</a> document. It is a top-level document property.
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a> object SHOULD have a
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array child property.
+              </p>
+            <pre>// sample template object
+{
+  "template" :
+  {
+    "data" : [ARRAY]  
+  }
+}</pre></sbody></div>
+        <h4 style="display:inline">4. </h4><a id="arrays"></a><h3 style="display:inline;clear:right">Arrays</h3>
+        <div class="sbody"><sbody><p>An array is an ordered sequence of zero or more values.
+          </p>
+            <ul class="clist">
+            The following elements are always represented as
+            <a href="http://amundsen.com/media-types/collection/format/#arrays" class="ext-link">Arrays</a> in
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+            documents. They are:
+            <li><a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a></li>
+              <li><a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a></li>
+              <li><a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a></li>
+              <li> and <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a>.</li>
+            </ul>
+            <p></p></sbody></div>
+        <h4 style="display:inline">4.1. </h4><a id="arrays-items"></a><h4 style="display:inline;clear:right">items</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> array represents the list of records
+                in the <a href="http://amundsen.com/media-types/collection/" class="ext-link">
+                Collection+JSON</a> document. It is a child property of the
+                <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> object.
+              </p>
+            <p>
+                Each element in the <a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> array SHOULD
+                contain an <a href="http://amundsen.com/media-types/collection/format/#property-href">href</a> property. The
+                <a href="http://amundsen.com/media-types/collection/format/#property-href">href</a> property MUST contain a
+                <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a>. This <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a> MAY
+                be used to retrieve a <a href="http://amundsen.com/media-types/collection/" class="ext-link">
+                Collection+JSON</a> document representing the associated <a href="http://amundsen.com/media-types/collection/format/#array-items">item</a>.
+                It MAY be used to edit or delete the associated <a href="http://amundsen.com/media-types/collection/format/#array-items">item</a>. See
+                <a href="http://amundsen.com/media-types/collection/format/#read-write" class="ext-link">Reading and Writing Data</a> for details.
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> array MAY have a 
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array child property.
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> array MAY have a 
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array child property.
+              </p><!-- comments
+              <ul class="comments">
+                <li>Add OPTIONAL <code>"title" : STRING</code> property to the anonymous item object (mca)</li>
+              </ul>
+              --><pre>// sample items array
+{
+  "collection" :
+  {
+    "version" : "1.0",
+    "href" : URI,
+    "items" :
+    [
+      {
+        "href" : URI,
+        "data" : [ARRAY],
+        "links" : [ARRAY]
+      },
+      ...
+      {
+        "href" : URI,
+        "data" : [ARRAY],
+        "links" : [ARRAY]
+      }
+    ]
+  }
+}</pre></sbody></div>
+        <h4 style="display:inline">4.2. </h4><a id="arrays-data"></a><h4 style="display:inline;clear:right">data</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array is a child property of the
+                <a href="http://amundsen.com/media-types/collection/format/#array-items">items</a> array and the <a href="http://amundsen.com/media-types/collection/format/#objects-template">
+                template object</a>.
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array SHOULD contain one or more anonymous objects. Each
+                object is MAY have any of three possible properties: <a href="http://amundsen.com/media-types/collection/format/#properties-name">name</a> (REQUIRED),
+                <a href="http://amundsen.com/media-types/collection/format/#properties-value">value</a> (OPTIONAL), and
+                <a href="http://amundsen.com/media-types/collection/format/#properties-prompt">prompt</a> (OPTIONAL). 
+              </p>
+            <pre>// sample data array
+{
+  "template" :
+  {
+    "data" :
+    [
+      {"prompt" : STRING, "name" : STRING, "value" : VALUE},
+      {"prompt" : STRING, "name" : STRING, "value" : VALUE},
+      ...
+      {"prompt" : STRING, "name" : STRING, "value" : VALUE}
+    ]
+  }
+}</pre></sbody></div>
+        <h4 style="display:inline">4.3. </h4><a id="arrays-queries"></a><h4 style="display:inline;clear:right">queries</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> array is an OPTIONAL top-level property
+                of the <a href="http://amundsen.com/media-types/collection/" class="ext-link">
+                Collection+JSON</a> document.
+              </p>
+            <p>
+                The <a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> array SHOULD contain one or more anonymous objects. Each
+                object composed of five possible properties: <a href="http://amundsen.com/media-types/collection/format/#properties-href">href</a> (REQUIRED),
+                <a href="http://amundsen.com/media-types/collection/format/#properties-rel">rel</a> (REQUIRED),
+                <a href="http://amundsen.com/media-types/collection/format/#properties-name">name</a> (OPTIONAL),
+                <a href="http://amundsen.com/media-types/collection/format/#properties-prompt">prompt</a> (OPTIONAL), and
+                a <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array (OPTIONAL). 
+              </p>
+            <p>
+                If present, the <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array represents query parameters
+                for the associated <a href="http://amundsen.com/media-types/collection/format/#properties-href">href</a> property of the same
+                object. See <a href="http://amundsen.com/media-types/collection/format/#query-templates" class="ext-link">Query Templates</a> for details.
+              </p><!-- comments>
+              <ul class="comments">
+                <li>Add OPTIONAL <code>"render" : "link|image|frame"</code> property to give client rendering hints. (mca)</li>
+              </ul>
+              --><pre>// sample queries array
+{
+  "queries" :
+  [
+    {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING},
+    {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING,
+      "data" :
+      [
+        {"name" : STRING, "value" : VALUE}
+      ]
+    },
+    ...
+    {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING}
+  ]
+}</pre></sbody></div>
+        <h4 style="display:inline">4.4. </h4><a id="arrays-links"></a><h4 style="display:inline;clear:right">links</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array is an OPTIONAL child property of the
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> array. It SHOULD contain one or more anonymous objects.
+                Each has five possible properties:
+                <a href="http://amundsen.com/media-types/collection/format/#properties-href">href</a> (REQUIRED),
+                <a href="http://amundsen.com/media-types/collection/format/#properties-rel">rel</a> (REQURIED), 
+                <a href="http://amundsen.com/media-types/collection/format/#properties-name">name</a> (OPTIONAL), 
+                <a href="http://amundsen.com/media-types/collection/format/#properties-render">render</a> (OPTIONAL), and
+                <a href="http://amundsen.com/media-types/collection/format/#properties-prompt">prompt</a>, (OPTIONAL).
+              </p><!-- comments
+              <ul class="comments">
+                <li>Add OPTIONAL <code>"render" : "link|image|frame"</code> property to give client rendering hints. (mca)</li>
+              </ul>
+              --><pre>// sample links array
+{
+  "collection" :
+  {
+    "version" : "1.0",
+    "href" : URI,
+    "items" :
+    [
+      {
+        "href" : URI,
+        "data" : [ARRAY],
+        "links" :
+        [
+          {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING, "render" : "image"},
+          {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING, "render" : "link"},
+          ...
+          {"href" : URI, "rel" : STRING, "prompt" : STRING, "name" : STRING}
+        ]
+      }
+    ]
+  }
+}</pre></sbody></div>
+        <h4 style="display:inline">5. </h4><a id="properties"></a><h3 style="display:inline;clear:right">Properties</h3>
+        <div class="sbody"><sbody><p>
+            Properties represent individual name/value pairs for objects within
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">
+              Collection+JSON
+            </a> documents.
+          </p></sbody></div>
+        <h4 style="display:inline">5.1. </h4><a id="properties-code"></a><h4 style="display:inline;clear:right">code</h4>
+        <div class="sbody"><sbody><p>
+                The
+                <a href="http://amundsen.com/media-types/collection/format/#property-code">code</a> property MAY be a child property of the 
+                <a href="http://amundsen.com/media-types/collection/format/#objects-error">error</a> object.
+              </p>
+            <p>  
+                It SHOULD be a <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> type.
+              </p></sbody></div>
+        <h4 style="display:inline">5.2. </h4><a id="properties-href"></a><h4 style="display:inline;clear:right">href</h4>
+        <div class="sbody"><sbody><ul class="clist">
+                The
+                <a href="http://amundsen.com/media-types/collection/format/#property-href">href</a> MAY be a child property of the following:
+                <li><a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> object</li>
+              <li><a href="http://amundsen.com/media-types/collection/format/#arrays-items">items</a> array elements</li>
+              <li><a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array elements</li> and
+                <li><a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> array elements</li>.
+              </ul>
+            <p></p>
+            <p>  
+                It MUST contain a valid <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a>.
+              </p></sbody></div>
+        <h4 style="display:inline">5.3. </h4><a id="properties-message"></a><h4 style="display:inline;clear:right">message</h4>
+        <div class="sbody"><sbody><p>
+                The
+                <a href="http://amundsen.com/media-types/collection/format/#property-message">message</a> property MAY be a child property of the 
+                <a href="http://amundsen.com/media-types/collection/format/#objects-error">error</a> object.
+              </p>
+            <p>  
+                It SHOULD be a <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> type.
+              </p></sbody></div>
+        <h4 style="display:inline">5.4. </h4><a id="properties-name"></a><h4 style="display:inline;clear:right">name</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#propeties-name">name</a> property MAY be a child element of
+                the <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array and the 
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array.
+              </p>
+            <p>
+                It SHOULD be a <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> data type.
+              </p></sbody></div>
+        <h4 style="display:inline">5.5. </h4><a id="properties-prompt"></a><h4 style="display:inline;clear:right">prompt</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/format/#properties-prompt">prompt</a> property MAY appear as a child property
+                of the <a href="http://amundsen.com/media-types/collection/format/#array-queries">queries</a> array,
+                the <a href="http://amundsen.com/media-types/collection/format/#array-links">links</a> array, and the
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-data">data</a> array.
+              </p>
+            <p>
+                It SHOULD be a <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> data type.
+              </p></sbody></div>
+        <h4 style="display:inline">5.6. </h4><a id="properties-rel"></a><h4 style="display:inline;clear:right">rel</h4>
+        <div class="sbody"><sbody><ul class="clist">
+                The
+                <a href="http://amundsen.com/media-types/collection/format/#property-rel">rel</a> MAY be a child property of the following:
+                <li><a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array elements</li> and
+                <li><a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> array elements</li>.
+              </ul>
+            <p>
+                It SHOULD be a <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> data type.
+              </p></sbody></div>
+        <h4 style="display:inline">5.7. </h4><a id="properties-render"></a><h4 style="display:inline;clear:right">render</h4>
+        <div class="sbody"><sbody><p>
+                The
+                <a href="http://amundsen.com/media-types/collection/format/#property-render">render</a> MAY be a child property of the 
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array element.
+              </p>
+            <p>
+                It SHOULD be a <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> data type. The value MUST
+                be either <code>image</code> or <code>link</code>. If the 
+                <a href="http://amundsen.com/media-types/collection/format/#property-render">render</a> property does not appear on a 
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array element, it should be assumed to
+                be set to <code>link</code>.
+              </p></sbody></div>
+        <h4 style="display:inline">5.8. </h4><a id="properties-title"></a><h4 style="display:inline;clear:right">title</h4>
+        <div class="sbody"><sbody><p>
+                The
+                <a href="http://amundsen.com/media-types/collection/format/#property-title">title</a> property MAY be a child property of the 
+                <a href="http://amundsen.com/media-types/collection/format/#objects-error">error</a> object.
+              </p>
+            <p>  
+                It SHOULD be a <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> type.
+              </p></sbody></div>
+        <h4 style="display:inline">5.9. </h4><a id="properties-value"></a><h4 style="display:inline;clear:right">value</h4>
+        <div class="sbody"><sbody><p>The <a href="http://amundsen.com/media-types/collection/format/#properties-value">value</a> property MAY be a child element of
+              <a href="http://amundsen.com/media-types/collection/format/#array-data">data</a> array elements</p>
+            <ul class="clist">It MAY contain one of the following data types:
+                <li><a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a></li>
+              <li><a href="http://amundsen.com/media-types/collection/format/#type-number">NUMBER</a></li>
+              <li><code>true</code>v</li>
+              <li><code>false</code></li> or
+                <li><code>null</code></li>
+            </ul>
+            <p></p></sbody></div>
+        <h4 style="display:inline">5.10. </h4><a id="properties-version"></a><h4 style="display:inline;clear:right">version</h4>
+        <div class="sbody"><sbody><p>
+                The
+                <a href="http://amundsen.com/media-types/collection/format/#property-version">version</a> SHOULD be a child property of the 
+                <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> collection element.
+                It SHOULD be a <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> data type. For this release, the
+                <a href="http://amundsen.com/media-types/collection/format/#property-version">version</a> SHOULD be set to <code>1.0</code>.
+              </p></sbody></div>
+        <h4 style="display:inline">6. </h4><a id="link-relations"></a><h3 style="display:inline;clear:right">Link Relations</h3>
+        <div class="sbody"><sbody><p>
+            Link relation values can be used to annotate <a href="http://amundsen.com/media-types/collection/format/#arrays-links">links</a> array and
+            <a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> array properties.
+          </p><!--
+          <ul class="comments">
+            <li>
+              Add predefined @rels for "collection", "item", "queries", and "template" in order to support
+              the possibility that some servers will not send all this information with every response and will
+              want to just send links for clients instead. (mca)
+            </li>
+            <li>
+              Add support for "paging" @rels or just refer to IANA link registry. (mca)
+            </li>
+          </ul>
+          --></sbody></div>
+        <h4 style="display:inline">6.1. </h4><a id="rels-collection"></a><h4 style="display:inline;clear:right">collection</h4>
+        <div class="sbody"><sbody><p>
+              The target IRI points to a resource which represents a list of which the context IRI is a member.
+              </p>
+            <p>
+              When used in the <a href="http://amundsen.com/media-types/colleciton/" class="ext-link">Collection+JSON</a>
+              media type, this link relation value refers to a <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a> document.
+              </p>
+            <p>
+              Logged with the <a href="http://microformats.org/wiki/existing-rel-values#non_HTML_rel_values" class="ext-link">Microformats Existing Rel Values</a>.
+              </p></sbody></div>
+        <h4 style="display:inline">6.2. </h4><a id="rels-items"></a><h4 style="display:inline;clear:right">item</h4>
+        <div class="sbody"><sbody><p>
+              The target IRI points to a resource that is a member of a collection represented by the context IRI.
+              </p>
+            <p>
+                When used in the <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+                media type, this link relation refers to an individual 
+                <a href="http://amundsen.com/media-types/collection/format/#arrays-items">item</a> in a <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>.
+              </p>
+            <p>
+              Logged with the <a href="http://microformats.org/wiki/existing-rel-values#non_HTML_rel_values" class="ext-link">Microformats Existing Rel Values</a>.
+              </p></sbody></div>
+        <h4 style="display:inline">6.3. </h4><a id="rels-template"></a><h4 style="display:inline;clear:right">template</h4>
+        <div class="sbody"><sbody><p>
+                The target IRI points to a resource that is a representation of a valid write template for the data
+                represented by the context IRI. 
+              </p>
+            <p>
+                When use in the <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+                media type, this link relation value refers to the <a href="http://amundsen.com/media-types/collection/format/#objects-template">template</a> object of a 
+                <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>.
+              </p></sbody></div>
+        <h4 style="display:inline">6.4. </h4><a id="rels-queries"></a><h4 style="display:inline;clear:right">queries</h4>
+        <div class="sbody"><sbody><p>
+                The target IRI points to a resource that is a representation of a list of valid queries that can be
+                executed against the data represented by the context IRI.
+              </p>
+            <p>
+                When used in the <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+                media type, this link relation value refers to the <a href="http://amundsen.com/media-types/collection/format/#arrays-queries">queries</a> object of a 
+                <a href="http://amundsen.com/media-types/collection/format/#objects-collection">collection</a>.
+              </p></sbody></div>
+        <h4 style="display:inline">6.5. </h4><a id="rels-other"></a><h4 style="display:inline;clear:right">Other Link Relation Values</h4>
+        <div class="sbody"><sbody><p>
+                The <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> media type 
+                has a limited set of defined link relations. Implementors are free to use any additional link relation values
+                as needed and are encouraged to use already defined link relation values found in existing registries. 
+              </p>
+            <p>
+                Suggested registries are (but not limited to):
+              </p>
+            <ul>
+              <li><a href="http://www.iana.org/assignments/link-relations/link-relations.xml" class="ext-link">IANA Link Relations</a></li>
+              <li><a href="http://microformats.org/wiki/existing-rel-values" class="ext-link">Microformats Existing Rel Values</a></li><!--<li><a href="http://paramsr.us/link-relation-types/" class="ext-link">Paramsr.us - Registering Link Relation Types</a></li>--><li><a href="http://dublincore.org/documents/dc-html/" class="ext-link">Expressing Dublin Core metadata using HTML/XHTML meta and link elements</a></li>
+            </ul>
+            <p>
+                Implementors may also wish to create their own unique link relation values using the standards outlined in
+                  <a href="http://tools.ietf.org/html/rfc5988" class="ext-link" title="Web Linking">RFC5988</a>.
+              </p></sbody></div>
+        <h4 style="display:inline">7. </h4><a id="data-types"></a><h3 style="display:inline;clear:right">Data Types</h3>
+        <div class="sbody"><sbody><p>
+            Below are the data types used in
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+            documents. The reference for most of the data type definitions below is the 
+            <a href="http://tools.ietf.org/html/rfc4627#section-2" class="ext-link">JSON Grammar</a>
+            section of the <a href="http://tools.ietf.org/html/rfc4627" title="The application/json Media Type for JavaScript Object Notation (JSON)" class="ext-link">
+            RFC4627
+            </a>.
+          </p><!--
+          <ul class="comments">
+            <li>Instead of copying RFC4627, just use pointers (Ngarthl)</li>
+          </ul>
+          --></sbody></div>
+        <h4 style="display:inline">7.1. </h4><a id="type-object"></a><h4 style="display:inline;clear:right">OBJECT</h4>
+        <div class="sbody"><sbody><p>
+                An <a href="http://amundsen.com/media-types/collection/format/#type-object">OBJECT</a> structure is represented as a pair of curly brackets
+                surrounding zero or more name/value pairs (or members).  A name is a
+                string.  A single colon comes after each name, separating the name
+                from the value.  A single comma separates a value from a following
+                name.  The names within an object SHOULD be unique.
+              </p></sbody></div>
+        <h4 style="display:inline">7.2. </h4><a id="type-array"></a><h4 style="display:inline;clear:right">ARRAY</h4>
+        <div class="sbody"><sbody><p>
+                An <a href="http://amundsen.com/media-types/collection/format/#type-array">ARRAY</a> structure is represented as square brackets surrounding zero
+                or more values (or elements).  Elements are separated by commas.
+              </p></sbody></div>
+        <h4 style="display:inline">7.3. </h4><a id="type-number"></a><h4 style="display:inline;clear:right">NUMBER</h4>
+        <div class="sbody"><sbody><p>
+                A <a href="http://amundsen.com/media-types/collection/format/#type-number">NUMBER</a> contains an integer component that
+                may be prefixed with an optional minus sign, which may be followed by
+                a fraction part and/or an exponent part.</p>
+            <p>
+                Octal and hex forms are not allowed.  Leading zeros are not allowed.
+              </p>
+            <p>
+                A fraction part is a decimal point followed by one or more digits.
+              </p>
+            <p>
+                An exponent part begins with the letter E in upper or lowercase,
+                which may be followed by a plus or minus sign.  The E and optional
+                sign are followed by one or more digits.
+              </p></sbody></div>
+        <h4 style="display:inline">7.4. </h4><a id="type-string"></a><h4 style="display:inline;clear:right">STRING</h4>
+        <div class="sbody"><sbody><p>
+                A <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a> begins and ends with
+                quotation marks.  All Unicode characters may be placed within the
+                quotation marks except for the characters that must be escaped:
+                quotation mark, reverse solidus, and the control characters (U+0000
+                through U+001F).
+              </p></sbody></div>
+        <h4 style="display:inline">7.5. </h4><a id="type-uri"></a><h4 style="display:inline;clear:right">URI</h4>
+        <div class="sbody"><sbody><p>
+              A <a href="http://amundsen.com/media-types/collection/format/#type-uri">URI</a> is defined by 
+              <a href="http://tools.ietf.org/html/rfc3986" title="Uniform Resource Identifier (URI): Generic Syntax" class="ext-link">RFC 3986</a></p></sbody></div>
+        <h4 style="display:inline">7.6. </h4><a id="type-value"></a><h4 style="display:inline;clear:right">VALUE</h4>
+        <div class="sbody"><sbody><p>
+                A <a href="http://amundsen.com/media-types/collection/format/#type=value">VALUE</a> data type MUST be a
+                <a href="http://amundsen.com/media-types/collection/format/#type-number">NUMBER</a>,
+                <a href="http://amundsen.com/media-types/collection/format/#type-string">STRING</a>, or one of the following literal names:
+                  <code>false</code>, <code>null</code>, or <code>true</code>.
+              </p>
+            <p><b>NOTE:</b> This release of <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+                does not support <a href="http://amundsen.com/media-types/collection/format/#type-object">OBJECT</a> or <a href="http://amundsen.com/media-types/collection/format/#type-array">ARRAY</a> as a valid
+                <a href="http://amundsen.com/media-types/collection/format/#type-value">VALUE</a>. 
+              </p></sbody></div>
+        <h4 style="display:inline">8. </h4><a id="extensibility"></a><h3 style="display:inline;clear:right">Extensibility</h3>
+        <div class="sbody"><sbody><p>
+            This document describes the 
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> markup vocabulary.  
+            Markup from other vocabularies ("foreign markup") can be used in a 
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+            document. Any extensions to the <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+            vocabulary MUST not redefine any 
+            <a href="http://amundsen.com/media-types/collection/format/#objects" class="ext-link">objects</a> (or their properties), 
+            <a href="http://amundsen.com/media-types/collection/format/#arrays" class="ext-link">arrays</a>,
+            <a href="http://amundsen.com/media-types/collection/format/#properties" class="ext-link">properties</a>,
+            <a href="http://amundsen.com/media-types/collection/format/#link-relations" class="ext-link">link relations</a>, or
+            <a href="http://amundsen.com/media-types/collection/format/#data-types" class="ext-link">data types</a> defined in this document.
+            Clients that do not recognize extensions to the
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a> vocabulary
+            SHOULD ignore them.
+          </p>
+            <p>
+            The details of designing and implementing 
+            <a href="http://amundsen.com/media-types/collection/" class="ext-link">Collection+JSON</a>
+            extensions is beyond the scope of this document.
+          </p>
+            <p><b>NOTE:</b> It is possible that future forward-compatible modifications to this specification
+            will include new objects, arrays, properties, link-relations, and data types. Extension
+            designers should take care to prevent future modifications from breaking or
+            redefining those extensions.
+          </p></sbody></div>
+        <h4 style="display:inline">9. </h4><a id="acknowledgements"></a><h3 style="display:inline;clear:right">Acknowledgements</h3>
+        <div class="sbody"><sbody><p>
+            The author gratefully acknowledges the following individuals who generously contributed 
+            corrections, comments, and criticism on the design of this media type:
+          </p>
+            <ul>
+              <li><a href="http://twitter.com/hamnis" class="ext-link">Erlend Hamnaberg</a></li>
+              <li><a href="http://twitter.com/pc1oad1etter" class="ext-link">Nick Pendley</a></li>
+              <li><a href="http://metcalf.net/" class="ext-link">David Metcalf</a></li>
+              <li>(<a class="ext-link">Qfwfq</a>)</li>
+            </ul></sbody></div>
+        <h4 style="display:inline">10. </h4><a id="references"></a><h3 style="display:inline;clear:right">References</h3>
+        <div class="sbody"><sbody><p></p>
+            <ul>
+              <li><a href="http://tools.ietf.org/html/rfc2119" class="ext-link">RFC2119 - Key words for use in RFCs to Indicate Requirement Levels</a></li>
+              <li><a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete" class="ext-link">Create-Update-Read-Delete (CRUD) [Wikipedia]</a></li>
+              <li><a href="http://www.iana.org/assignments/link-relations/link-relations.xml" class="ext-link">IANA Link Relations</a></li>
+              <li><a href="http://microformats.org/wiki/existing-rel-values" class="ext-link">Microformats Existing Rel Values</a></li>
+              <li><a href="http://paramsr.us/link-relation-types/" class="ext-link">Paramsr.us - Registering Link Relation Types</a></li>
+              <li><a href="http://dublincore.org/documents/dc-html/" class="ext-link">Expressing Dublin Core metadata using HTML/XHTML meta and link elements</a></li>
+              <li><a href="http://tools.ietf.org/html/rfc5988" class="ext-link">RFC5988 - Web Linking</a></li>
+              <li><a href="http://tools.ietf.org/html/rfc4627" class="ext-link">RFC2627 - The application/json Media Type for JavaScript Object Notation (JSON)</a></li>
+              <li><a href="http://tools.ietf.org/html/rfc3986" class="ext-link">RFC3986 -  Uniform Resource Identifier (URI): Generic Syntax</a></li>
+            </ul></sbody></div>
+        <h3 id="history">Update History</h3>
+        <dl class="update-history">
+          <dt>2011-07-12</dt>
+          <dd><notes>IANA registration added, also minor edits</notes></dd>
+          <dt>2011-05-20</dt>
+          <dd><notes>Expanded the General Concepts section, added References, additional minor edits</notes></dd>
+          <dt>2011-05-19</dt>
+          <dd><notes>Cleaned up content, incorporated feedback from reviewers</notes></dd>
+          <dt>2011-05-05</dt>
+          <dd><notes>Filled in semantics, added feedback from reviewers</notes></dd>
+          <dt>2011-05-04</dt>
+          <dd><notes>Initial post</notes></dd>
+        </dl>
+      </div>
+    </div>
+    <div id="footer">
+      <address>updated: 2013-02-24</address>
+    </div><script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script><script type="text/javascript">
+        _uacct = "UA-2399548-1";
+        urchinTracker();
+        </script>
+</body></html>
