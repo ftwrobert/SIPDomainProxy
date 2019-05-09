@@ -1,5 +1,5 @@
 {
   secrets => ['...'],
-  salt => ['...'],
+  salt => '...',
   dbstr => 'postgresql://user:pass@host/db',
 }

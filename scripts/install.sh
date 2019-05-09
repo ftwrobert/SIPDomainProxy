@@ -49,7 +49,7 @@ ln -s "$SRCDIR/scripts/proxyctl" "/usr/local/sbin/proxyctl"
 cat > $SRCDIR/sipdomain_proxy_web/s_i_p_domain_proxy_web.conf <<EOF
 {
   secrets => ['$(< /dev/urandom tr -dc A-Za-z0-9 | head -c40)'],
-  salt => ['$(< /dev/urandom tr -dc A-Za-z0-9 | head -c16)'],
+  salt => '$(< /dev/urandom tr -dc A-Za-z0-9 | head -c16)',
   dbstr => 'postgresql://$DB_USER:$DB_PASS@$DB_HOST/$DB_NAME',
 }
 EOF
@@ -70,7 +70,7 @@ apt-get -y install perl-doc libmodern-perl-perl \
                    libgetopt-long-descriptive-perl libclass-dbi-perl \
                    libclass-dbi-pg-perl libtext-table-perl libnetaddr-ip-perl \
                    libdata-validate-domain-perl libmojolicious-perl \
-                   libmojo-pg-perl
+                   libmojo-pg-perl libdigest-bcrypt-perl
 # RTPEngine Prerequisites
 apt-get -y install dpkg-dev debhelper default-libmysqlclient-dev \
                    libmysqlclient-dev gperf iptables-dev libavcodec-dev \
