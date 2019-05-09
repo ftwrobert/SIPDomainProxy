@@ -46,6 +46,15 @@ SRCKAMDIR="$SRCDIR/kamailio/conf"
 # create a symlink for proxyctl
 ln -s "$SRCDIR/scripts/proxyctl" "/usr/local/sbin/proxyctl"
 
+cat > $SRCDIR/sipdomain_proxy_web/s_i_p_domain_proxy_web.conf <<EOF
+{
+  secrets => ['$(< /dev/urandom tr -dc A-Za-z0-9 | head -c40)'],
+  salt => ['$(< /dev/urandom tr -dc A-Za-z0-9 | head -c16)'],
+  dbstr => 'postgresql://$DB_USER:$DB_PASS@$DB_HOST/$DB_NAME',
+}
+EOF
+SDPWSALT=$(< /dev/urandom tr -dc A-Za-z0-9 | head -c20)
+
 # Create user accounts
 if ! grep -qE "^/usr/sbin/nologin" /etc/shells
 then
@@ -60,7 +69,8 @@ apt-get -y install build-essential bison flex git wget
 apt-get -y install perl-doc libmodern-perl-perl \
                    libgetopt-long-descriptive-perl libclass-dbi-perl \
                    libclass-dbi-pg-perl libtext-table-perl libnetaddr-ip-perl \
-                   libdata-validate-domain-perl libmojolicious-perl
+                   libdata-validate-domain-perl libmojolicious-perl \
+                   libmojo-pg-perl
 # RTPEngine Prerequisites
 apt-get -y install dpkg-dev debhelper default-libmysqlclient-dev \
                    libmysqlclient-dev gperf iptables-dev libavcodec-dev \
@@ -206,6 +216,12 @@ CREATE TABLE customer_auth (
   )
 );
 
+-- SIPDomainProxyWeb logins
+CREATE TABLE users (
+  id        SERIAL PRIMARY KEY,
+  username  VARCHAR(256) UNIQUE,
+  password  VARCHAR(256)
+);
 
 -- Prevent deletion of customer_auth unless both trusted_id and subscriber_id
 -- are NULL

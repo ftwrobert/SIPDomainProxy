@@ -3,10 +3,10 @@ API Documentation
 
 Media Type
 =======
-This application will use the following media types from https://www.iana.org/assignments/media-types/media-types.xhtml
+This application uses the following media types from https://www.iana.org/assignments/media-types/media-types.xhtml. A copy of the published specification for each of these can be found in the public directory of this application.
 
-[application/vnd.collection+json](Collection+JSON.html)  
-[application/vnd.collection.next+json](Collection.next+JSON.html)  
+  * `application/vnd.collection+json`  
+  * `application/vnd.collection.next+json`  
 
 Magic Strings
 =======

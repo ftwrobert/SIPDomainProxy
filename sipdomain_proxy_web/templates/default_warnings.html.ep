@@ -1,0 +1,42 @@
+% if( defined $c->flash('alert-danger') ) {
+<div class="alert alert-danger alert-dismissable">
+  <button type="button"
+      class="close"
+      data-dismiss="alert"
+      aria-hidden="true">&times;</button>
+  <p class="alert">
+    <span class="glyphicon glyphicon-warning-sign darkred"
+        aria-hidden="true"
+        title="Whoops!"></span>
+    <%= $c->flash('alert-danger') %>
+  </p>
+</div>
+% }
+% if( defined $c->flash('alert-success') ) {
+<div class="alert alert-success alert-dismissable">
+  <button type="button"
+      class="close"
+      data-dismiss="alert"
+      aria-hidden="true">&times;</button>
+  <p class="alert">
+    <span class="glyphicon glyphicon-thumbs-up green"
+        aria-hidden="true"
+        title="Well Done!"></span>
+    <%= $c->flash('alert-success') %>
+  </p>
+</div>
+% }
+% if( defined $c->flash('alert-info') ) {
+<div class="alert alert-info alert-dismissable">
+  <button type="button"
+      class="close"
+      data-dismiss="alert"
+      aria-hidden="true">&times;</button>
+  <p class="alert">
+    <span class="glyphicon glyphicon-info-sign blue"
+        aria-hidden="true"
+        title="Heads Up!"></span>
+    <%= $c->flash('alert-info') %>
+  </p>
+</div>
+% }

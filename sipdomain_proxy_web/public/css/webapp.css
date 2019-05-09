@@ -1,0 +1,7 @@
+#tree-controller {
+    overflow: scroll;
+}
+
+.item-selected {
+    background-color: #ADD8E6;
+}

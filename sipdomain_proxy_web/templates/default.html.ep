@@ -1,0 +1,13 @@
+% layout 'default';
+% title 'Welcome';
+
+<div class="container">
+  <h2>SIPDomainProxy Web Manangement</h2>
+
+  <p>
+  Please use the github's Issue tracker for submitting bugs and making feature
+  requests. You can find it
+  <a href='https://github.com/ftwrobert/SIPDomainProxy/issues'>Here</a>
+  </p>
+
+</div>

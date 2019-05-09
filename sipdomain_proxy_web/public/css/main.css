@@ -1,0 +1,114 @@
+body {
+  background-color: #eee;
+}
+div.templates {
+  display: none;
+}
+div.account-basics {
+  background-color: white;
+}
+div.alert {
+  font-size: larger;
+}
+
+p.alert {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  text-align: center;
+}
+
+table.account-recent-ledger-activity,
+table.account-open-task-summary,
+table.mrr-change-summary {
+  background-color: white;
+}
+
+table.mrr-change-summary td.mrr-change-summary-desc{
+  text-align: right;
+}
+
+table.mrr-changes td.account-name,
+table.mrr-changes td.account-total {
+  font-weight: bold;
+}
+
+table.mrr-changes tr.table-spacer {
+  background-color: #777;
+}
+
+table.mrr-changes tr.account td{
+  border-top: 8pt solid #777;
+}
+
+table.mrr-changes td.service-total,
+table.mrr-changes td.account-total,
+table.mrr-changes td.service-id {
+  text-align: right;
+}
+
+table.mrr-changes tr.service.new td.activation-date {
+  color: green;
+}
+
+.top-buffer {
+  margin-top: 10px;
+}
+
+.list-group-heading {
+  background-color: #ddd;
+}
+
+.money { font-weight: bold; }
+
+.nodisplay { display: none; }
+
+.link { cursor: pointer; }
+
+.red { color: red; }
+.darkred { color: darkred; }
+.green { color: green; }
+.blue { color: blue; }
+.orange { color: orange; }
+
+.align-right {
+  text-align: right;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+
+textarea.contract-notes {
+  font-family: monospace;
+}
+
+#rate-edit-form {
+  background-color: #d9edf7;
+}
+
+span.contract-glyph-active,
+span.contract-glyph-expired,
+span.contract-glyph-superceded { display:none; }
+
+span.contract-glyph-active.active,
+span.contract-glyph-expired.expired,
+span.contract-glyph-superceded.superceded { display:inline; }

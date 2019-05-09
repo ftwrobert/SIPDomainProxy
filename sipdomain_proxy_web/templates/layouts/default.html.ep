@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html>
-  <head><title><%= title %></title></head>
-  <body><%= content %></body>
-</html>
+%= include 'default_top'
+%= include 'main_nav'
+%= include 'default_warnings'
+    <%= content %>
+%= include 'default_bottom'
