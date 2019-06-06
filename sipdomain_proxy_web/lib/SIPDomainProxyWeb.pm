@@ -1,7 +1,6 @@
 package SIPDomainProxyWeb;
 use Mojo::Base 'Mojolicious';
 use Mojo::Pg;
-use Mojo::AsyncAwait;
 use Mojo::Promise;
 use Mojo::IOLoop;
 
