@@ -3,13 +3,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script type="text/javascript"
-    src="<%= $c->url_for('/bootstrap/js/bootstrap.min.js') %>"></script>
-<!-- Javascript Views JSRender (view templates) -->
-<script src="<%= $c->url_for('/jsviews/jsrender.min.js') %>"></script>
-<!-- SpineJS (Javascript MVC) -->
-<script src="<%= $c->url_for('/spine/lib/spine.js') %>"></script>
-<script src="<%= $c->url_for('/spine/lib/local.js') %>"></script>
+<script type="text/javascript" src="<%= $c->url_for('/bootstrap/js/bootstrap.min.js') %>"></script>
 
 </body>
 

@@ -144,6 +144,7 @@ CREATE ROLE $DB_USER WITH PASSWORD '$DB_PASS' LOGIN;
 CREATE DATABASE $DB_NAME WITH OWNER $DB_USER;
 SQL_COMMANDS
 cat > /tmp/sql_prefix <<END_OF_SQL_COMMANDS
+CREATE EXTENSION tablefunc;
 CREATE EXTENSION prefix;
 CREATE CAST (text as prefix_range) WITH FUNCTION prefix_range(text) AS IMPLICIT;
 CREATE CAST (prefix_range as text) WITH FUNCTION text(prefix_range);

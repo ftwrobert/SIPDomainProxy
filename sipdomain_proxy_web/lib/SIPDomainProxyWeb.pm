@@ -1,6 +1,9 @@
 package SIPDomainProxyWeb;
 use Mojo::Base 'Mojolicious';
 use Mojo::Pg;
+use Mojo::AsyncAwait;
+use Mojo::Promise;
+use Mojo::IOLoop;
 
 # This method will run once at server start
 sub startup {
@@ -37,16 +40,6 @@ Commands:
 
   push @{$self->commands->namespaces}, 'SIPDomainProxyWeb::Command';
 
-  # Add the MIME type Collection.next+JSON
-  # https://www.iana.org/assignments/media-types/application/vnd.collection.next+json
-  # Collection.next+JSON is an improvement upon Collection+JSON
-  # https://www.iana.org/assignments/media-types/application/vnd.collection+json
-  # I have placed a copy of each of these guides in public
-  $self->types->type( cnjson => 'application/vnd.collection.next+json' );
-  #
-  my $plugins = Mojolicious::Plugins->new;
-  $plugins->register_plugin( 'SIPDomainProxyWeb::Plugin::CollectionNextJSON', $self );
-
   # Router
   my $r = $self->routes;
 
@@ -60,6 +53,59 @@ Commands:
     $self->render( template => 'default' );
   });
 
+  $auth->get('/domains')
+       ->to('domain#domain')
+       ->name('domain');
+  $auth->post('/domains')
+       ->to('domain#add_domain');
+  $auth->post('/domains/rm/:id' => [id => q/\d+/])
+       ->to('domain#remove_domain')
+       ->name('rmdomain');
+
+  $auth->get('/customers')
+       ->to('customer#customers')
+       ->name('customers');
+  $auth->post('/customers')
+       ->to('customer#add_customer');
+  $auth->get('/customer/:id' => [id => q/\d+/])
+       ->to('customer#customer')
+       ->name('customer');
+  $auth->post('/customer/:id' => [id => q/\d+/])
+       ->to('customer#mod_customer');
+  $auth->post('/customer/:id/add_billing_group' => [id => q/\d+/])
+       ->to('billing_group#add_billing_group')
+       ->name('add_billing_group');
+  $auth->post('/customers/rm/:id' => [id => q/\d+/])
+       ->to('customer#remove_customer')
+       ->name('rmcustomer');
+
+  $auth->get('/billing_group/:id' => [id => q/\d+/])
+       ->to('billing_group#billing_group')
+       ->name('billing_group');
+  $auth->post('/billing_group/:id' => [id => q/\d+/])
+       ->to('billing_group#mod_billing_group');
+  $auth->post('/billing_group/rm/:id' => [id => q/\d+/])
+       ->to('billing_group#remove_billing_group')
+       ->name('rmbilling_group');
+  $auth->post('/billing_group/:id/numbers' => [id => q/\d+/])
+       ->to('number#add_tns')
+       ->name('numbers');
+  $auth->post('/billing_group/:id/numbers/rm' => [id => q/\d+/])
+       ->to('number#remove_tns')
+       ->name('rmnumbers');
+
+  $auth->post('/billing_group/:id/auths' => [id => q/\d+/])
+       ->to('authentication#add_auth')
+       ->name('auths');
+
+  $auth->post('/billing_group/:id/auths/:aid' => [id => q/\d+/,
+                                                  aid => q/\d+/])
+       ->to('authentication#mod_auth')
+       ->name('mod_auth');
+  $auth->post('/billing_group/:id/auths/:aid/rm' => [id => q/\d+/,
+                                                     aid => q/\d+/])
+       ->to('authentication#remove_auth')
+       ->name('rmauth');
 }
 
 1;

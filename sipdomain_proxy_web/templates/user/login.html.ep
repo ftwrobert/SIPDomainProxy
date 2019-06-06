@@ -1,4 +1,4 @@
-% layout 'default';
+% layout 'login';
 % title 'Login';
 <div class="container">
 <form class="form-signin" action="<%= $c->url_for('/login') %>"

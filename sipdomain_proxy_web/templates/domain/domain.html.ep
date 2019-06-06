@@ -1,0 +1,63 @@
+% layout 'default';
+% title 'Domains';
+<div class="container">
+
+  <form class="form-newdomain" action="<%= $c->url_for('domain') %>"
+    method="post" accept-charset="utf-8">
+
+    <h5>Add a new domain</h5>
+    <table class="table">
+      <tr>
+        <th>Domain</th>
+        <th>PBX IP Address</th>
+        <th>PBX SIP Port</th>
+        <th>PBX Type</th>
+        <th></th>
+      </tr>
+      <tr>
+        <td><input class="form-control" type="text" name="fqdn" id="fqdn" placeholder="FQDN" required autofocus></td>
+        <td><input class="form-control" type="text" name="addr" id="addr" placeholder="127.0.0.1" required></td>
+        <td><input class="form-control" type="text" name="sipport" id="sipport" placeholder="5060" required></td>
+        <td>
+          <input type="radio" name="pbx_type" id="passthrough" value="passthrough" checked>
+          <label for="passthrough">Passthrough</label>
+          <br>
+          <input type="radio" name="pbx_type" id="registration" value="registration">
+          <label for="registration">Registration</label>
+        </td>
+        <td><input class="btn btn-primary form-control" type="submit" value="Add Domain"></td>
+      </tr>
+    </table>
+  </form>
+  <hr>
+<% if( defined stash('requested') ) { =%>
+  <input type="hidden" name="requested" value="<%= stash('requested') %>">
+<% } =%>
+
+  <h4>Domains</h4>
+  <table class="table">
+    <tr>
+      <th>Domain</th>
+      <th>PBX IP Address</th>
+      <th>PBX SIP Port</th>
+      <th>PBX Type</th>
+      <th></th>
+    </tr>
+  % while (my $row = $domains->hash) {
+    <tr>
+      <td><%= $row->{'domain'}%></td>
+      <td><%= $row->{'pbx_addr'}%></td>
+      <td><%= $row->{'pbx_sipport'}%></td>
+      <td><%= $row->{'authtype'}%></td>
+      <td>
+        <form action="<%= $c->url_for('rmdomain', id => $row->{'id'}) %>" method="post" accept-charset="utf-8">
+          <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+          <br>
+        </form>
+      </td>
+    </tr>
+  % }
+  </table>
+
+</form>
+</div>

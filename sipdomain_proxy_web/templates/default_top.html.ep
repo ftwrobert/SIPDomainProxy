@@ -20,7 +20,7 @@
     <!-- SIPDomainProxyWeb -->
     <link href="<%= $c->url_for('/css/main.css') %>" rel="stylesheet">
     <link href="<%= $c->url_for('/css/main_nav.css') %>" rel="stylesheet">
-    <link href="<%= $c->url_for('/css/webapp.css') %>" rel="stylesheet">
+    <!-- <link href="<%= $c->url_for('/css/webapp.css') %>" rel="stylesheet"> -->
 
   </head>
 

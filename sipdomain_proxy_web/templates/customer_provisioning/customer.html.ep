@@ -1,0 +1,66 @@
+% layout 'default';
+% title 'Customer';
+<div class="container">
+
+  <form action="<%= $c->url_for('customer', id => $id) %>" method="post" accept-charset="utf-8" style="display: inline;">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="customer_name">Customer Name:</span>
+      </div>
+      <input class="form-control" aria-describedby="customer_name" type="text" name="descr" placeholder="Customer Name" value="<%= $descr %>">
+      <button type="submit" class="btn btn-primary" style="float: right">Update</button>
+    </div>
+  </form>
+  <hr>
+
+  <form class="form-newdomain" action="<%= $c->url_for('add_billing_group', id => $id) %>"
+    method="post" accept-charset="utf-8">
+
+    <h5>Add a new billing group</h5>
+    <table class="table">
+      <tr>
+        <th>Billing Group</th>
+        <th>Billing TN</th>
+        <th></th>
+      </tr>
+      <tr>
+        <td><input class="form-control" type="text" name="descr" id="descr" placeholder="Billing Group Name" required autofocus></td>
+        <td><input class="form-control" type="text" name="pai" id="pai" placeholder="P-Asserted-Identity" required></td>
+        <td><input class="btn btn-primary form-control" type="submit" value="Add Billing Group"></td>
+      </tr>
+    </table>
+  </form>
+  <hr>
+<% if( defined stash('requested') ) { =%>
+  <input type="hidden" name="requested" value="<%= stash('requested') %>">
+<% } =%>
+
+  <h4>Billing Groups</h4>
+  <table class="table">
+    <tr>
+      <th>Billing Group</th>
+      <th>Billing TN</th>
+      <th>Options</th>
+    </tr>
+  % while (my $row = $billing_groups->hash) {
+    <tr>
+      <td><%= $row->{'descr'}%></td>
+      <td><%= $row->{'pai'}%></td>
+      <td>
+        <form action="#" method="get" accept-charset="utf-8" style="display: inline;">
+          <div class="btn-group">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
+            <div class="dropdown-menu">
+              <input type=submit formmethod="get" formaction="<%= $c->url_for('billing_group', id => $row->{'id'}) %>" class="dropdown-item" value="Edit">
+              <input type=submit formmethod="post" formaction="<%= $c->url_for('rmbilling_group', id => $row->{'id'}) %>" class="dropdown-item" value="Delete">
+            </div>
+          </div>
+        </form>
+
+      </td>
+    </tr>
+  % }
+  </table>
+
+</form>
+</div>

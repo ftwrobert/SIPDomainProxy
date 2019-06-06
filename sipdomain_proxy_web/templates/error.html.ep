@@ -1,0 +1,19 @@
+% layout 'default';
+% title 'Welcome';
+
+<div class="container">
+  <h2>SIPDomainProxy Web Manangement</h2>
+
+  <h3>Unable to proccess request</h3>
+
+  <p>
+  Something went wrong when attempting to process your request. Please contact the administrator of this site.
+  </p>
+
+  <p>
+  Please use the github's Issue tracker for submitting bugs and making feature
+  requests. You can find it
+  <a href='https://github.com/ftwrobert/SIPDomainProxy/issues'>Here</a>
+  </p>
+
+</div>

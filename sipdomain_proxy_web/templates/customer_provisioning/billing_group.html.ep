@@ -1,0 +1,211 @@
+% layout 'default';
+% title 'Billing Group';
+<div class="container">
+
+  <form action="<%= $c->url_for('billing_group', id => $billing_group->{'customer_bg_id'}) %>" method="post" accept-charset="utf-8" style="display: inline;">
+
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="customer_name">Customer Name:</span>
+      </div>
+      <a href="<%= $c->url_for('customer', id => $billing_group->{'customer_id'}) %>" class="form-control" aria-describedby="customer_name"><%= $billing_group->{'customer_descr'} %></a>
+    </div>
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="billing_group">Billing Group:</span>
+      </div>
+      <input required class="form-control" aria-describedby="billing_group" type="text" name="descr" placeholder="Billing Group" value="<%= $billing_group->{'customer_bg_descr'} %>">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="billing_group_pai">Billing TN:</span>
+      </div>
+      <input required class="form-control" aria-describedby="billing_group_pai" type="text" name="pai" placeholder="P-Asserted-Identity (required)" value="<%= $billing_group->{'customer_bg_pai'} %>">
+      <button type="submit" class="btn btn-primary" style="float: right">Update</button>
+    </div>
+  </form>
+  <hr>
+
+  <div class="row">
+    <div class="col">
+      <h4>Authentication</h4>
+      <p>add a new authentication</p>
+      <form action="<%= $c->url_for('auths', id => $billing_group->{'customer_bg_id'}) %>" method="post" accept-charset="utf-8" style="display: inline;">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="customer_name">Domain:</span>
+          </div>
+          <select name="domain" class="form-control">
+            % while (my $row = $domains->hash) {
+            <option value="<%= $row->{'id'} %>"><%= $row->{'did'} %></option>
+            % }
+          </select>
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="customer_name">Username:</span>
+          </div>
+          <input class="form-control" aria-describedby="billing_group" type="text" name="username" placeholder="Username">
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="customer_name">Password:</span>
+          </div>
+          <input class="form-control" aria-describedby="billing_group" type="text" name="password" placeholder="Password">
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="customer_name">Trusted Addr:</span>
+          </div>
+          <input class="form-control" aria-describedby="billing_group" type="text" name="addr" placeholder="Trusted Source Address">
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="customer_name">Billing TN:</span>
+          </div>
+          <input class="form-control" aria-describedby="billing_group" type="text" name="pai" placeholder="P-Asserted-Identity (optional)">
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="customer_name">Priorty:</span>
+          </div>
+          <select name="priority" class="form-control">
+            <option value="2">Low</option>
+            <option value="1" selected>Normal</option>
+            <option value="0">High</option>
+          </select>
+          <button type="submit" class="btn btn-primary" style="float: right">Add</button>
+        </div>
+      </form>
+    </div>
+    <div class="col">
+      <h4>Phone Numbers</h4>
+      <p>add or remove numbers</p>
+      <form action="#" method="post" accept-charset="utf-8" style="display: inline;">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">TN's</span>
+          </div>
+          <textarea required class="form-control" name="prefixes"></textarea>
+        </div>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Billing TN</span>
+          </div>
+          <input class="form-control" aria-describedby="billing_group" type="text" name="pai" placeholder="P-Asserted-Identity (optional)">
+          <div class="btn-group">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
+            <div class="dropdown-menu">
+              <input type=submit formaction="<%= $c->url_for('numbers', id => $billing_group->{'customer_bg_id'}) %>" class="dropdown-item" value="Add">
+              <input type=submit formaction="<%= $c->url_for('rmnumbers', id => $billing_group->{'customer_bg_id'}) %>" class="dropdown-item" value="Delete">
+              <a class="dropdown-item" data-toggle="collapse" href="#collapseHelp" role="button" aria-expanded="false" aria-controls="collapseHelp">TN Format</a>
+            </div>
+          </div>
+        </div>
+        <div class="collapse" id="collapseHelp">
+          <a class="dropdown-item" data-toggle="collapse" href="#collapseHelp" role="button" aria-expanded="false" aria-controls="collapseHelp">Hide</a>
+          <div class="card card-body">
+            <p>
+            The TN input area may contain a comma, space, or new-line separated list of the following regular expressions<br>
+              [0-9]{10}             - A single 10-Digit number<br>
+              [0-9]{10}-[0-9]{10}   - All numbers between two 10-Digit numbers (inclusive)<br>
+              [0-9]{10}+[0-9]{1,3}  - All numbers starting with a 10-Digit number and counting up<br>
+            </p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <br><hr><br>
+  <div class="row">
+    <div class="col">
+      <h5>Allowed Authentications</h5>
+      % while (my $row = $authorizations->hash) {
+      <form action="#" method="post" accept-charset="utf-8" style="display: inline;">
+      <div class="row">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="customer_name">Domain:</span>
+            </div>
+            <span class="form-control"><%= $row->{'domain'} %></span>
+            <input type="hidden" name="domain" value="<%= $row->{'domain'} %>">
+          </div>
+
+          % if ($row->{'type'} eq 'digest') {
+
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="customer_name">Username:</span>
+            </div>
+            <span class="form-control"><%= $row->{'username'} %></span>
+            <input type="hidden" name="username" value="<%= $row->{'username'} %>">
+          </div>
+
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="customer_name">Password:</span>
+            </div>
+            <input name="password" placeholder="Password" value="<%= $row->{'password'} %>" class="form-control" aria-describedby="billing_group" type="text">
+          </div>
+
+          % } elsif ($row->{'type'} eq 'trusted') {
+
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="customer_name">Trusted Addr:</span>
+            </div>
+            <span class="form-control"><%= $row->{'src_ip'} %></span>
+            <input type="hidden" name="addr" value="<%= $row->{'src_ip'} %>">
+          </div>
+
+          % }
+
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="customer_name">Billing TN:</span>
+            </div>
+            <input name="pai" placeholder="P-Asserted-Identity (optional)" value="<%= $row->{'pai'} %>" class="form-control" aria-describedby="billing_group" type="text">
+          </div>
+
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="customer_name">Priority:</span>
+            </div>
+            <select name="priority" class="form-control">
+              <option value="2"
+                % if ($row->{'priority'} == 2 ) {
+                selected
+                % }
+              >Low</option>
+              <option value="1"
+                % if ($row->{'priority'} == 1 ) {
+                selected
+                % }
+              >Normal</option>
+              <option value="0"
+                % if ($row->{'priority'} == 0 ) {
+                selected
+                % }
+              >High</option>
+            </select>
+            <div class="btn-group">
+              <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
+              <div class="dropdown-menu">
+                <input type=submit formaction="<%= $c->url_for('mod_auth', id => $billing_group->{'customer_bg_id'}, aid => $row->{'id'}) %>" class="dropdown-item" value="Update">
+                <input type=submit formaction="<%= $c->url_for('rmauth', id => $billing_group->{'customer_bg_id'}, aid => $row->{'id'}) %>" class="dropdown-item" value="Delete">
+              </div>
+            </div>
+          </div>
+      </div>
+      </form>
+      <hr>
+      % }
+      </div>
+    <div class="col">
+      <h5>Active Numbers</h5>
+      <div style="column-count: 4;">
+        % while (my $row = $prefixes->hash) {
+        <p><%= $row->{'prefix'} %></p>
+        % }
+      </div>
+    </div>
+  </div>
+</div>

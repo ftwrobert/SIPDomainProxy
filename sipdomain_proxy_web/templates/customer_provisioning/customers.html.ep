@@ -1,0 +1,50 @@
+% layout 'default';
+% title 'Customers';
+<div class="container">
+
+  <form class="form-newdomain" action="<%= $c->url_for('customers') %>"
+    method="post" accept-charset="utf-8">
+
+    <h5>Add a new customer</h5>
+    <table class="table">
+      <tr>
+        <th>Customer Name</th>
+        <th></th>
+      </tr>
+      <tr>
+        <td><input class="form-control" type="text" name="descr" id="descr" placeholder="Account Name" required autofocus></td>
+        <td><input class="btn btn-primary form-control" type="submit" value="Add Customer"></td>
+      </tr>
+    </table>
+  </form>
+  <hr>
+<% if( defined stash('requested') ) { =%>
+  <input type="hidden" name="requested" value="<%= stash('requested') %>">
+<% } =%>
+
+  <h4>Customers</h4>
+  <table class="table">
+    <tr>
+      <th>Customer Name</th>
+      <th>Options</th>
+    </tr>
+  % while (my $row = $customers->hash) {
+    <tr>
+      <td><%= $row->{'descr'}%></td>
+      <td>
+        <form action="#" method="get" accept-charset="utf-8" style="display: inline;">
+          <div class="btn-group">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
+            <div class="dropdown-menu">
+              <input type=submit formmethod="get" formaction="<%= $c->url_for('customer', id => $row->{'id'}) %>" class="dropdown-item" value="Edit">
+              <input type=submit formmethod="post" formaction="<%= $c->url_for('rmcustomer', id => $row->{'id'}) %>" class="dropdown-item" value="Delete">
+            </div>
+          </div>
+        </form>
+      </td>
+    </tr>
+  % }
+  </table>
+
+</form>
+</div>
