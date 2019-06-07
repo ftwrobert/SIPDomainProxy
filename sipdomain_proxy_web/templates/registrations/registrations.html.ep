@@ -1,0 +1,52 @@
+% layout 'default';
+% title 'Registrations';
+
+<div class="container">
+  <form action="<%= url_for('registrations') %>" method="get" accept-charset="utf-8" style="display: inline;">
+
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="domain">Domain:</span>
+      </div>
+      <select name="domain" class="form-control">
+        <option value=""
+          % if ($domain eq '' ) {
+          selected
+          % }
+        >All Domains</option>
+        % while (my $row = $domains->hash) {
+        <option value="<%= $row->{'id'} %>"
+          % if ($row->{'id'} eq $domain ) {
+          selected
+          % }
+        ><%= $row->{'domain'} %></option>
+        % }
+      </select>
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="user">User:</span>
+      </div>
+      <input name="user" placeholder="Username" value="<%= $user %>" class="form-control" aria-describedby="user" type="text">
+      <button type="submit" class="btn btn-primary">Filter Results</button>
+    </div>
+  </form>
+  <br><hr><br>
+  <h3>Active Registrations</h3>
+  <table class="table">
+    <tr>
+      <th>Subscriber</th>
+      <th>Contact</th>
+      <th>Received</th>
+      <th>Last Modified</th>
+      <th>Useragent</th>
+    </tr>
+    % while (my $row = $locations->hash) {
+    <tr>
+      <td><%= $row->{'username'} %>@<%= $row->{'domain'} %></td>
+      <td><%= $row->{'contact'} %></td>
+      <td><%= $row->{'received'} %></td>
+      <td><%= $row->{'last_modified'} %></td>
+      <td><%= $row->{'user_agent'} %></td>
+    </tr>
+    % }
+  </table>
+</div>

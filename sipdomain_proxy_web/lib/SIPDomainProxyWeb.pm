@@ -105,6 +105,10 @@ Commands:
                                                      aid => q/\d+/])
        ->to('authentication#remove_auth')
        ->name('rmauth');
+
+  $auth->get('/registrations')
+       ->to('registrations#registrations')
+       ->name('registrations');
 }
 
 1;

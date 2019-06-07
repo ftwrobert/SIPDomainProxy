@@ -100,7 +100,7 @@ sed -i -e "s/127.0.0.1\/32  *md5/127.0.0.1\/32     trust/" \
  $PSQLDIR/pg_hba.conf
 sed -i -e "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" \
  $PSQLDIR/postgresql.conf
-sed -i -e "s/max_connections = 100/max_connections = 30/" \
+sed -i -e "s/max_connections = 100/max_connections = 500/" \
  $PSQLDIR/postgresql.conf
 sed -i -e "s/shared_buffers = 128MB/shared_buffers = 512MB/" \
  $PSQLDIR/postgresql.conf
