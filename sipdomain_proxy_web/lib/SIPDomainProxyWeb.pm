@@ -109,6 +109,10 @@ Commands:
   $auth->get('/registrations')
        ->to('registrations#registrations')
        ->name('registrations');
+
+  $auth->get('/search')
+       ->to('search#search')
+       ->name('search');
 }
 
 1;

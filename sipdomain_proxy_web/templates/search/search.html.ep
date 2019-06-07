@@ -1,0 +1,23 @@
+% layout 'default';
+% title 'Search';
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <h4>Search Results</h4>
+      <table class="table">
+        <tr>
+          <th>Customer</th>
+          <th>Billing Group</th>
+          <th>Number</th>
+        </tr>
+      % while (my $row = $results->hash) {
+        <tr>
+          <td><a href="<%= url_for('customer', id => $row->{'customer_id'}) %>"><%= $row->{'customer_descr'}%></a></td>
+          <td><a href="<%= url_for('billing_group', id => $row->{'customer_bg_id'}) %>"><%= $row->{'customer_bg_descr'}%></a></td>
+          <td><%= $row->{'prefix'}%></td>
+        </tr>
+      % }
+      </table>
+    </div>
+  </div>
+</div>
