@@ -13,10 +13,10 @@ sub registrations {
   $self->stash(domains => $r1);
   my $where;
   if ($domain ne '' && $user ne '') {
-    $where = "WHERE domain = ? AND username = ?";
+    $where = "WHERE domain = (SELECT domain FROM domain WHERE id = ?) AND username = ?";
   }
   elsif ($domain ne '') {
-    $where = "WHERE domain = ?";
+    $where = "WHERE domain = (SELECT domain FROM domain WHERE id = ?)";
   }
   elsif ($user ne '') {
     $where = "WHERE username = ?";
