@@ -15,12 +15,6 @@ sub verify_auth {
         $self->flash('requested' => $self->req->url);
         $self->redirect_to($self->url_for('login')->to_string);
         return undef;
-      },
-      cnjson => sub {
-        $self->render(
-          text   => $self->url_for('login')->to_string,
-          status => 401
-        );
       }
     );
   }
@@ -64,6 +58,42 @@ sub logout {
   my $self = shift;
   $self->session(expires => 1);
   $self->redirect_to('/login');
+}
+
+sub mod_username_password {
+  my $self = shift;
+  my $db = $self->pg->db;
+
+  if ($self->param('username') eq '' || $self->param('password') eq '') {
+    $self->redirect_to('settings');
+  }
+  else {
+    my $q1 = <<SQL;
+INSERT INTO users (username, password)
+VALUES (?,?)
+ON CONFLICT (username) DO UPDATE SET password = EXCLUDED.password;
+SQL
+    my $config = $self->app->config;
+    my $bcrypt = Digest->new('Bcrypt');
+    $bcrypt->cost(7);
+    $bcrypt->salt($config->{salt});
+    $bcrypt->add($self->param('password'));
+    $db->query($q1, ($self->param('username'), $bcrypt->b64digest));
+    $self->redirect_to('settings');
+  }
+}
+
+sub delete_user {
+  my $self = shift;
+  if ($self->param('username') eq $self->session('username')) {
+    $self->redirect_to('settings');
+  }
+  else {
+    my $db = $self->pg->db;
+    my $q1 = "DELETE FROM users WHERE username = ?";
+    $db->query($q1, ($self->param('username')));
+    $self->redirect_to('settings');
+  }
 }
 
 1;

@@ -113,6 +113,16 @@ Commands:
   $auth->get('/search')
        ->to('search#search')
        ->name('search');
+
+  $auth->get('/settings')
+       ->to('settings#settings')
+       ->name('settings');
+  $auth->post('/users')
+       ->to('user#mod_username_password')
+       ->name('users');
+  $auth->post('/users/rm')
+       ->to('user#delete_user')
+       ->name('rmuser');
 }
 
 1;

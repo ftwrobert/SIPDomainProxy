@@ -1,0 +1,49 @@
+% layout 'default';
+% title 'Settings';
+
+<div class="container">
+  <h4>Users</h4>
+  <div class="col">
+    <h5>Add User</h5>
+    <form action="<%= $c->url_for('users') %>" method="post" accept-charset="utf-8" style="display: inline;">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="customer_name">Username:</span>
+        </div>
+        <input type="text" name="username" value="" class="form-control">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="customer_name">Password:</span>
+        </div>
+        <input type="text" name="password" value="" class="form-control">
+        <button class="btn btn-primary my-2 my-sm-0" type="submit">Add</button>
+      </div>
+    </form>
+    <br><hr><br>
+  </div>
+  <div class="col">
+    <h5>Active Users</h5>
+    % while (my $row = $users->hash) {
+    <form action="#" method="post" accept-charset="utf-8" style="display: inline;">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="customer_name">Username:</span>
+        </div>
+        <span class="form-control"><%= $row->{'username'} %></span>
+        <input type="hidden" name="username" value="<%= $row->{'username'} %>">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="customer_name">Password:</span>
+        </div>
+        <input name="password" placeholder="Password" value="" class="form-control" aria-describedby="billing_group" type="text">
+        <div class="btn-group">
+          <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
+          <div class="dropdown-menu">
+            <input type=submit formaction="<%= $c->url_for('users') %>" class="dropdown-item" value="Update">
+            <input type=submit formaction="<%= $c->url_for('rmuser') %>" class="dropdown-item" value="Delete">
+          </div>
+        </div>
+      </div>
+    </form>
+    <br>
+    % }
+  </div>
+</div>
