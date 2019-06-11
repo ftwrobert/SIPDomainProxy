@@ -262,23 +262,23 @@ mkdir -p /usr/src/rtpengine
 cd /usr/src/rtpengine
 git clone https://github.com/sipwise/rtpengine.git rtpengine
 cd rtpengine
-git checkout -b mr7.2.1 origin/mr7.2.1
+git checkout -b mr6.5 origin/mr6.5
 # Do not compile g729 support
 export DEB_BUILD_PROFILES="pkg.ngcp-rtpengine.nobcg729"
 # Build Deb packages
 dpkg-buildpackage
 cd /usr/src/rtpengine
 # Install rtpengine and the iptables module for rtpengine
-if [ ! -f ngcp-rtpengine-daemon_7.2.1.4+0~mr7.2.1.4_amd64.deb ]; then
+if [ ! -f ngcp-rtpengine-daemon_6.5.5.0+0~mr6.5.5.0_amd64.deb ]; then
   echo "deb packages were not successfully compiled, unable to continue"
   exit 1
 fi
 
-dpkg -i ngcp-rtpengine-daemon_7.2.1.4+0~mr7.2.1.4_amd64.deb
-dpkg -i ngcp-rtpengine-iptables_7.2.1.4+0~mr7.2.1.4_amd64.deb
+dpkg -i ngcp-rtpengine-daemon_6.5.5.0+0~mr6.5.5.0_amd64.deb
+dpkg -i ngcp-rtpengine-iptables_6.5.5.0+0~mr6.5.5.0_amd64.deb
 if [  $RTPE_KERNEL_MOD -eq 1 ]; then
   apt-get -y install dkms
-  dpkg -i ngcp-rtpengine-kernel-dkms_7.2.1.4+0~mr7.2.1.4_all.deb
+  dpkg -i ngcp-rtpengine-kernel-dkms_6.5.5.0+0~mr6.5.5.0_all.deb
   modprobe xt_RTPENGINE
   echo 'xt_RTPENGINE' >> /etc/modules
 fi
