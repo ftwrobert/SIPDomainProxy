@@ -422,9 +422,9 @@ Group=$KAMAILIO_USER
 RemainAfterExit=yes
 SyslogIdentifier=sipdomain_proxy
 Environment='PIDFile=/var/run/sipdomain_proxy.pid'
-ExecStart=/usr/bin/hypnotoad $SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web
-ExecStop=/usr/bin/hypnotoad -s $SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web
-ExecReload=/usr/bin/hypnotoad $SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web
+ExecStart=/usr/bin/hypnotoad "$SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web"
+ExecStop=/usr/bin/hypnotoad -s "$SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web"
+ExecReload=/usr/bin/hypnotoad "$SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web"
 Restart=always
 
 [Install]
@@ -433,6 +433,7 @@ EOF
 
 systemctl enable sipdomain_proxy
 echo "starting sipdomain_proxy"
+chown -R $KAMAILIO_USER:$KAMAILIO_USER "$SRCDIR/sipdomain_proxy_web/"
 systemctl start sipdomain_proxy
 
 cat <<DONE
