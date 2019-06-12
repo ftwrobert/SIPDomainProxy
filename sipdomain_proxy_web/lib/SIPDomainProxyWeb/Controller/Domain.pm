@@ -26,7 +26,13 @@ SQL
   unless ($r1->rows > 0 && $r2->rows > 0) {
     warn "Unable to add domain";
   }
-  $self->redirect_to('domain');
+  if (system(('kamcmd', 'domain.reload')) != 0) {
+    warn "Unable to reload kamailio";
+    $self->render(template => 'exception');
+  }
+  else {
+    $self->redirect_to('domain');
+  }
 }
 
 sub domain {
@@ -84,7 +90,13 @@ SQL
     warn "Unable to delete attrs";
     $self->render(template => 'exception');
   }
-  $self->redirect_to('domain');
+  if (system(('kamcmd', 'domain.reload')) != 0) {
+    warn "Unable to reload kamailio";
+    $self->render(template => 'exception');
+  }
+  else {
+    $self->redirect_to('domain');
+  }
 }
 
 1;
