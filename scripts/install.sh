@@ -410,10 +410,32 @@ echo "starting kamailio"
 chown -R $KAMAILIO_USER:$KAMAILIO_USER "$DSTKAMDIR"
 systemctl start kamailio
 
+cat > /lib/systemd/system/sipdomain_proxy.service <<EOF
+[Unit]
+Description=SIPDomainProxy Web Application
+After=network.target
+
+[Service]
+Type=simple
+User=$KAMAILIO_USER
+Group=$KAMAILIO_USER
+RemainAfterExit=yes
+SyslogIdentifier=sipdomain_proxy
+Environment='PIDFile=/var/run/sipdomain_proxy.pid'
+ExecStart=/usr/bin/hypnotoad $SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web
+ExecStop=/usr/bin/hypnotoad -s $SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web
+ExecReload=/usr/bin/hypnotoad $SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable sipdomain_proxy
+echo "starting sipdomain_proxy"
+systemctl start sipdomain_proxy
+
 cat <<DONE
-Done, please confim that rtpengine has started correctly.
-INFO: If you are running this in a LXD environment, please be aware:
-        You need to reboot now to load the kernel module xt_RTPENGINE
 SETTINGS:
   DB_DRIVER=$DB_DRIVER
   DB_HOST=$DB_HOST
@@ -427,7 +449,6 @@ SETTINGS:
   PRIVSUBNET=$PRIVSUBNET
   PRIVMASK=$PRIVMASK
   SIPPORT=$SIPPORT
-  SIPTLSPORT=$SIPTLSPORT
   RTPE_MIN_PORT=$RTPE_MIN_PORT
   RTPE_MAX_PORT=$RTPE_MAX_PORT
   RTPE_SOCKET=$RTPE_SOCKET
@@ -435,4 +456,14 @@ SETTINGS:
   DSTKAMDIR=$DSTKAMDIR
   SRCDIR=$SRCDIR
   SRCKAMDIR=$SRCKAMDIR
+
+Installation complete.
+
+A basic CLI client has been installed, for more information run this command
+  proxyctl --help
+
+The web interface can be accessed at http://$PRIVADDR:8080
+Please create a web username and password with this command
+  $SRCDIR/sipdomain_proxy_web/script/sipdomain_proxy_web setpass USERNAME NEW_PASSWORD
+
 DONE
