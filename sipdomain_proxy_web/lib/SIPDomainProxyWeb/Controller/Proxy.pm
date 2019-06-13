@@ -9,7 +9,7 @@ INSERT INTO rpc_hosts (name, addr)
 VALUES (?,?);
 SQL
   $db->query($q1 => ($self->param('name'), $self->param('addr')));
-  $self->rediret_to('settings');
+  $self->redirect_to('settings');
 }
 
 sub delete_proxy {
@@ -19,7 +19,7 @@ sub delete_proxy {
 DELETE FROM rpc_hosts
 WHERE id = ?;
 SQL
-  $db->quer($q1, ($self->param('id')));
+  $db->query($q1, ($self->param('id')));
   $self->redirect_to('settings');
 }
 
