@@ -127,7 +127,7 @@ Commands:
   $auth->post('/proxies')
        ->to('proxy#add_proxy')
        ->name('proxy');
-  $auth->post('/proxies/rm/:id' => [id => q/\d+/)
+  $auth->post('/proxies/rm/:id' => [id => q/\d+/])
        ->to('proxy#delete_proxy')
        ->name('rmproxy');
 }

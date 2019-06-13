@@ -282,12 +282,12 @@ psql -h $DB_HOST -U $DB_USER $DB_NAME -f /tmp/SIPDomainProxy.schema
 
 # Download RTPEngine
 mkdir -p /usr/src/rtpengine
+# Do not compile g729 support
+export DEB_BUILD_PROFILES="pkg.ngcp-rtpengine.nobcg729"
 cd /usr/src/rtpengine
 git clone https://github.com/sipwise/rtpengine.git rtpengine
 cd rtpengine
 git checkout -b mr6.5 origin/mr6.5
-# Do not compile g729 support
-export DEB_BUILD_PROFILES="pkg.ngcp-rtpengine.nobcg729"
 # Build Deb packages
 dpkg-buildpackage
 cd /usr/src/rtpengine
@@ -427,7 +427,7 @@ cat > config.cfg <<EOF
 #!subst "/RTPE_SOCKET/udp:$RTPE_SOCKET/"
 
 # PRC paramaters
-#!subst "/RPC_SUBNET/$RPC_SUBNET/"
+#!subst "/RPC_SUBNET/$(echo "$RPC_SUBNET" | sed 's/\//\\\//g')/"
 #!subst "/RPC_PATH/$RPC_PATH/"
 EOF
 

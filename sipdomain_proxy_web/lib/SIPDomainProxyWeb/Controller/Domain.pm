@@ -102,7 +102,7 @@ SQL
 sub reload_domains {
   my $self = shift;
   my $db = $self->pg->db;
-  my $ua = Mojo::userAgent->new
+  my $ua = Mojo::UserAgent->new;
   my $q1 = "SELECT value FROM settings WHERE name = 'rpc_path'";
   my $path = $db->query($q1)->hash->{'value'};
   my $q2 = <<SQL;
@@ -113,7 +113,7 @@ SQL
   my $r2 = $db->query($q2);
   if ($r2->rows > 0) {
     while (my $row = $r2->hash) {
-      my $tx = $ua->get('http://' . $row->addr . ":5060/$path" => {Accept => '*/*'} => json => {
+      my $tx = $ua->get('http://' . $row->{'addr'} . ":5060/$path" => {Accept => '*/*'} => json => {
         "jsonrpc" => "2.0",
         "method" => "domain.reload",
         "id" => "1"
