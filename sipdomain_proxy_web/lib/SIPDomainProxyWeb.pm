@@ -27,10 +27,6 @@ Commands:
 
   # Load configuration from hash returned by config file
   my $config = $self->plugin('Config');
-  say 'Loading config variables';
-  say 'secrets=' . $config->{secrets};
-  say 'salt=' . $config->{salt};
-  say 'dbstr=' . $config->{dbstr};
 
   # Configure the application
   $self->secrets($config->{secrets});
