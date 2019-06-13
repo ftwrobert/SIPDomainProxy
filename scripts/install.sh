@@ -38,6 +38,8 @@ RTPE_SOCKET='127.0.0.1:2223'
 RTPE_KERNEL_MOD=0 # Set to 1 if installing in a VM or a dedicated host.
 RTPE_FWD_TABLE=0        # https://github.com/sipwise/rtpengine#the-kernel-module
 DSTKAMDIR="/etc/kamailio"
+RPC_SUBNET="127.0.0.1/32"
+RPC_PATH=$(< /dev/urandom tr -dc A-Za-z0-9 | head -c20)
 
 # Determine the working directory of SIPDomainProxy
 SRCDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../ && pwd )
@@ -224,6 +226,20 @@ CREATE TABLE users (
   password  VARCHAR(256)
 );
 
+-- SIPDomainProxyWeb RPC HOSTS
+CREATE TABLE rpc_hosts (
+  id   SERIAL PRIMARY KEY,
+  name VARCHAR(256) UNIQUE,
+  addr INET
+);
+
+-- SIPDomainProxyWeb settings
+CREATE TABLE settings (
+  id    SERIAL PRIMARY KEY,
+  name  VARCHAR(256) UNIQUE,
+  value VARCHAR(256)
+);
+
 -- Prevent deletion of customer_auth unless both trusted_id and subscriber_id
 -- are NULL
 -- We prevent deletion rather then cascade delete because we are not going to
@@ -253,6 +269,13 @@ CREATE TABLE did_numbers (
   prefix         prefix_range NOT NULL UNIQUE,
   pai            VARCHAR(64)
 );
+
+INSERT INTO rpc_hosts (name, addr)
+VALUES ('$(hostname)', '$PRIVADDR');
+
+INSERT INTO settings (name, value)
+VALUES ('rpc_path', '$RPC_PATH');
+
 EOF
 # import SIPDomainProxy tables into postgres
 psql -h $DB_HOST -U $DB_USER $DB_NAME -f /tmp/SIPDomainProxy.schema
@@ -402,6 +425,10 @@ cat > config.cfg <<EOF
 
 # RTP Engine paramaters
 #!subst "/RTPE_SOCKET/udp:$RTPE_SOCKET/"
+
+# PRC paramaters
+#!subst "/RPC_SUBNET/$RPC_SUBNET/"
+#!subst "/RPC_PATH/$RPC_PATH/"
 EOF
 
 # Enable and start Kamailio
@@ -457,6 +484,9 @@ SETTINGS:
   DSTKAMDIR=$DSTKAMDIR
   SRCDIR=$SRCDIR
   SRCKAMDIR=$SRCKAMDIR
+  RPC_SUBNET=$RPC_SUBNET
+  RPC_PATH=$RPC_PATH
+
 
 Installation complete.
 

@@ -1,6 +1,6 @@
 package SIPDomainProxyWeb::Controller::Domain;
 use Mojo::Base 'Mojolicious::Controller';
-use Mojo::JSON qw(decode_json encode_json);
+use Mojo::UserAgent;
 
 sub add_domain {
   my $self = shift;
@@ -26,7 +26,7 @@ SQL
   unless ($r1->rows > 0 && $r2->rows > 0) {
     warn "Unable to add domain";
   }
-  if (system(('kamcmd', 'domain.reload')) != 0) {
+  if (! reload_domains($self)) {
     warn "Unable to reload kamailio";
     $self->render(template => 'exception');
   }
@@ -90,13 +90,41 @@ SQL
     warn "Unable to delete attrs";
     $self->render(template => 'exception');
   }
-  if (system(('kamcmd', 'domain.reload')) != 0) {
+  if (! reload_domains($self)) {
     warn "Unable to reload kamailio";
     $self->render(template => 'exception');
   }
   else {
     $self->redirect_to('domain');
   }
+}
+
+sub reload_domains {
+  my $self = shift;
+  my $db = $self->pg->db;
+  my $ua = Mojo::userAgent->new
+  my $q1 = "SELECT value FROM settings WHERE name = 'rpc_path'";
+  my $path = $db->query($q1)->hash->{'value'};
+  my $q2 = <<SQL;
+SELECT addr
+FROM rpc_hosts
+ORDER BY addr;
+SQL
+  my $r2 = $db->query($q2);
+  if ($r2->rows > 0) {
+    while (my $row = $r2->hash) {
+      my $tx = $ua->get('http://' . $row->addr . ":5060/$path" => {Accept => '*/*'} => json => {
+        "jsonrpc" => "2.0",
+        "method" => "domain.reload",
+        "id" => "1"
+      });
+      say $tx->result->body();
+    }
+  }
+  else {
+    return 0;
+  }
+  return 1;
 }
 
 1;

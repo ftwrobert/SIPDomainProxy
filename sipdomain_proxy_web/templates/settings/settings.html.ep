@@ -45,5 +45,43 @@
     </form>
     <br>
     % }
+    <br><hr><br>
+  </div>
+  <h4>Proxies</h4>
+  <div class="col">
+    <h5>Add Proxy</h5>
+    <form action="<%= $c->url_for('proxy') %>" method="post" accept-charset="utf-8" style="display: inline;">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="name">Name:</span>
+        </div>
+        <input type="text" name="name" value="" class="form-control">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="addr">Address:</span>
+        </div>
+        <input type="text" name="addr" value="" class="form-control">
+        <button class="btn btn-primary my-2 my-sm-0" type="submit">Add</button>
+      </div>
+    </form>
+    <br><hr><br>
+  </div>
+  <div class="col">
+    <h5>Active Proxies</h5>
+    % while (my $row = $rpc_hosts->hash) {
+    <form action="<%= $c->url_for('rmproxy', id => $row->{'id'}) %>" method="post" accept-charset="utf-8" style="display: inline;">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Name:</span>
+        </div>
+        <span class="form-control"><%= $row->{'name'} %></span>
+        <div class="input-group-prepend">
+          <span class="input-group-text">Address:</span>
+        </div>
+        <span class="form-control"><%= $row->{'addr'} %></span>
+        <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+      </div>
+    </form>
+    <br>
+    % }
   </div>
 </div>

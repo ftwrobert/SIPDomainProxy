@@ -123,6 +123,13 @@ Commands:
   $auth->post('/users/rm')
        ->to('user#delete_user')
        ->name('rmuser');
+
+  $auth->post('/proxies')
+       ->to('proxy#add_proxy')
+       ->name('proxy');
+  $auth->post('/proxies/rm/:id' => [id => q/\d+/)
+       ->to('proxy#delete_proxy')
+       ->name('rmproxy');
 }
 
 1;

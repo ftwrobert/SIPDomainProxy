@@ -19,3 +19,7 @@
 
 # RTP Engine paramaters
 #!subst "/RTPE_SOCKET//"
+
+# PRC paramaters
+#!subst "/RPC_SUBNET//"
+#!subst "/RPC_PATH//"
