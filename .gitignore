@@ -1,3 +1,4 @@
 kamailio/conf/config.cfg
+kamailio/conf/global_parameters_custom.cfg
 sipdomain_proxy_web/s_i_p_domain_proxy_web.conf
 sipdomain_proxy_web/script/hypnotoad.pid
