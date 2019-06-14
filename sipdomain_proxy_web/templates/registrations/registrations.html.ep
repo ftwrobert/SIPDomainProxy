@@ -30,7 +30,7 @@
     </div>
   </form>
   <br><hr><br>
-  <h3>Active Registrations</h3>
+  <h3>Active Registrations (<%= $locations->rows %>)</h3>
   <table class="table">
     <tr>
       <th>Subscriber</th>
